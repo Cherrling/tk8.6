@@ -1,0 +1,4 @@
+usr/lib/*/*.so
+usr/lib/*/*.so.*
+usr/lib/tcltk/*/tk*
+usr/share/tcltk/tk*

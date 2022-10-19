@@ -1,0 +1,130 @@
+#!/usr/bin/make -f
+
+v = 8.6
+DIR = $(shell pwd)/debian/tmp
+
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+include /usr/share/dpkg/architecture.mk
+
+ifeq ($(origin CC),default)
+CC = $(DEB_HOST_GNU_TYPE)-gcc
+endif
+
+ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+# See bug #446335
+CFLAGS += -fno-unit-at-a-time
+endif
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	[ ! -f unix/Makefile ] || $(MAKE) -C unix distclean
+
+override_dh_autoreconf:
+	dh_autoreconf autoreconf -- -f -i unix
+
+override_dh_auto_configure:
+	TK_LIBRARY="/usr/share/tcltk/tk$(v)" \
+	CC="$(CC)" \
+	CFLAGS="$(CFLAGS)" \
+	CPPFLAGS="$(CPPFLAGS)" \
+	TK_SHLIB_LD_EXTRAS="-Wl,-soname,\$${TK_LIB_FILE}" \
+	dh_auto_configure -Dunix -- \
+		      --includedir=/usr/include/tcl$(v) \
+		      --with-tcl=/usr/lib/$(DEB_HOST_MULTIARCH)/tcl$(v) \
+		      --enable-shared \
+		      --enable-threads \
+		      --disable-rpath \
+		      --enable-xft \
+		      --enable-man-symlinks
+
+override_dh_auto_build:
+	$(MAKE) -C unix
+	# Build the static library
+	cd unix && \
+	  LC_ALL=C \
+	  ar cr libtk$(v).a *.o && \
+	  ar d libtk$(v).a tkAppInit.o && \
+	  ranlib libtk$(v).a
+
+override_dh_auto_install:
+	$(MAKE) -C unix INSTALL_ROOT=$(DIR) \
+			MAN_INSTALL_DIR=$(DIR)/usr/share/man \
+			MANN_INSTALL_DIR=$(DIR)/usr/share/man/man3 \
+		install
+	# Fix up pkgInstall.tcl
+	install -d -m 755 $(DIR)/usr/lib/tcltk/$(DEB_HOST_MULTIARCH)/tk$(v)
+	sed -e 's:\$$dir \.\.:/usr/lib/$(DEB_HOST_MULTIARCH):' \
+	       $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/tk$(v)/pkgIndex.tcl \
+	       >$(DIR)/usr/lib/tcltk/$(DEB_HOST_MULTIARCH)/tk$(v)/pkgIndex.tcl
+	# Fix up the libraries
+	cp unix/libtk$(v).a $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)
+	mv $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/*.sh $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/tk$(v)
+	mv $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/tk.pc $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/tk$(v).pc
+	# Fix up the include files
+	install -d $(DIR)/usr/include/tcl$(v)/tk-private/generic/ttk
+	cp generic/*.h $(DIR)/usr/include/tcl$(v)/tk-private/generic
+	cp generic/ttk/*.h $(DIR)/usr/include/tcl$(v)/tk-private/generic/ttk
+	install -d $(DIR)/usr/include/tcl$(v)/tk-private/unix
+	cp unix/*.h $(DIR)/usr/include/tcl$(v)/tk-private/unix
+	install -d $(DIR)/usr/include/tcl$(v)/tk-private/compat
+	cp compat/*.h $(DIR)/usr/include/tcl$(v)/tk-private/compat
+	# Move the demos to the doc package
+	install -d -m 755 $(DIR)/usr/share/doc/tk$(v)-doc
+	mv -f $(DIR)/usr/share/tcltk/tk$(v)/demos $(DIR)/usr/share/doc/tk$(v)-doc
+	rm -f $(DIR)/usr/share/doc/tk$(v)-doc/demos/license.terms
+	#
+	# Temporary HACK until all reverse dependencies will be rebuilt
+	ln -sf libtk$(v).so $(DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/libtk$(v).so.0
+	#
+	# Fix up the manpages.
+	cd $(DIR)/usr/share/man/man1 && mv wish.1 wish$(v).1
+	cd $(DIR)/usr/share/man/man3 && \
+	  for f in *.[3n] ; do \
+	     f2=$$(echo $$f | sed -e 's/\.[3n]/.3tk/') ; \
+	     if [ -L $$f ]; then \
+	        l=$$(readlink -n $$f |sed -e 's/\.[3n]/.3tk/') ; \
+	        rm $$f ; \
+	        ln -sf $$l $$f2 ; \
+	     else \
+	     	sed -e 's/^\.TH \([^ ]\+\|"[^"]\+"\) [3n]/.TH \1 3tk/' \
+		    -e 's/\([0-9A-Za-z]\+\)(3)/\1(3tk)/g' \
+		    -e 's/bgerror(n)/bgerror(3tcl)/g' \
+		    -e 's/fconfigure(n)/fconfigure(3tcl)/g' \
+		    -e 's/history(n)/history(3tcl)/g' \
+		    -e 's/interp(n)/interp(3tcl)/g' \
+		    -e 's/library(n)/library(3tcl)/g' \
+		    -e 's/load(n)/load(3tcl)/g' \
+		    -e 's/package(n)/package(3tcl)/g' \
+		    -e 's/puts(n)/puts(3tcl)/g' \
+		    -e 's/safe(n)/safe(3tcl)/g' \
+		    -e 's/source(n)/source(3tcl)/g' \
+		    -e 's/tclvars(n)/tclvars(3tcl)/g' \
+		    -e 's/tclvars\\fR(n)/tclvars\\fR(3tcl)/g' \
+		    -e 's/unknown(n)/unknown(3tcl)/g' \
+		    -e 's/(n)/(3tk)/g' \
+		    -e 's/^\.de OP$$/.de OOP/' \
+		    -e 's/^.OP /.OOP /' \
+		    $$f >$$f2 ; \
+	        rm $$f ; \
+	     fi ; \
+	  done
+
+override_dh_compress:
+	dh_compress -Xusr/share/doc/tk$(v)-doc/demos/
+
+override_dh_makeshlibs:
+	dh_makeshlibs -a
+
+override_dh_shlibdeps:
+	dh_shlibdeps -ldebian/libtk$(v)/usr/lib/$(DEB_HOST_MULTIARCH)
+
+get-orig-source:
+	wget -O tk$(v)_$(v).12.orig.tar.gz \
+	     http://prdownloads.sourceforge.net/tcl/tk$(v).12-src.tar.gz
+
+.PHONY: override_dh_auto_clean override_dh_auto_configure override_dh_auto_build \
+	override_dh_auto_install override_dh_compress \
+	override_dh_makeshlibs override_dh_shlibdeps get-orig-source override_dh_autoreconf

@@ -1,0 +1,328 @@
+tk8.6 (8.6.12-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Bump debhelper compatibility level to 12.
+  * Bump standards version to 4.6.0.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 06 Nov 2021 17:45:30 +0300
+
+tk8.6 (8.6.11.1-1) unstable; urgency=medium
+
+  * New upstream bugfix release.
+  * Fix the debian/watch uscan control file.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 06 Sep 2021 08:38:52 +0300
+
+tk8.6 (8.6.11-2) unstable; urgency=medium
+
+  * Drop unused Build-Depends: libxt-dev. (Closes: #981603)
+
+ -- Sergei Golovan <sgolovan@debian.org>  Tue, 02 Feb 2021 11:11:52 +0300
+
+tk8.6 (8.6.11-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Add a few symbols to debian/libtk8.6.symbols.
+  * Bump standards version to 4.5.1.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 04 Jan 2021 20:00:50 +0300
+
+tk8.6 (8.6.10-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches. Remove no longer necessary ones.
+  * Replace README by README.md in docs to install.
+  * Bump standards version to 4.4.1.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 25 Nov 2019 09:23:27 +0300
+
+tk8.6 (8.6.9-2) unstable; urgency=medium
+
+  * Install the pkgcontrol file tk8.6.pc to the tk8.6-dev package.
+  * Bump standards version to 4.3.0.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sun, 24 Feb 2019 00:52:43 +0300
+
+tk8.6 (8.6.9-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches. Remove the no longer necessary patch which fixed
+    crashes when using untrusted X connections.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Wed, 12 Dec 2018 09:18:39 +0300
+
+tk8.6 (8.6.8-4) unstable; urgency=medium
+
+  * Add a patch which sets the default font sizes in points instead of pixels.
+  * Add a patch by upstream which fixes Tk behaviour over untrusted X
+    connections (closes: 888581).
+  * Add the Salse VCS headers.
+  * Bump debhelper compatibility level to 10.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 24 Mar 2018 21:42:17 +0300
+
+tk8.6 (8.6.8-3) unstable; urgency=medium
+
+  * Rebuild using tcl8.6-dev 8.6.8+dfsg-3 which isn't linked against libieee
+    anymore.
+  * Fix a spelling error in a patch description.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 23 Feb 2018 07:24:50 +0300
+
+tk8.6 (8.6.8-2) unstable; urgency=medium
+
+  * Removed the libtk8.6-dbg package which is no longer necessary, as
+    there is an automatically created mechanism for creating debug packages
+    (closes: #885894).
+  * Bumped standards version to 4.1.3.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Thu, 04 Jan 2018 15:24:49 +0300
+
+tk8.6 (8.6.8-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Replaced the libtk8.6-dbg package priority to optional.
+  * Bumped standards version to 4.1.2.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 25 Dec 2017 08:58:45 +0300
+
+tk8.6 (8.6.7-1) unstable; urgency=medium
+
+  * New upstream release (closes: #860927).
+  * Refreshed patches.
+  * Arch-qualify TCL_CC.
+  * Sort the object files inside the static library using the C locale to make
+    the build reproducible (closes: #818753).
+  * Don't add ldconfig trigger manually since dh_makeshlibs can do it iself.
+  * Bumped standards version to 4.0.0.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Thu, 10 Aug 2017 12:45:27 +0300
+
+tk8.6 (8.6.6-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Bumped standards version to 3.9.8.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Thu, 28 Jul 2016 06:22:39 +0300
+
+tk8.6 (8.6.5-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Dropped the +dfsg suffix because the upstream tarball is DFSG-free again.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Thu, 03 Mar 2016 16:30:22 +0300
+
+tk8.6 (8.6.4+dfsg-3) unstable; urgency=medium
+
+  * Replaced calling ldconfig in postinst/postrm scripts by a trigger
+    (closes: #811123).
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 16 Jan 2016 13:23:42 +0300
+
+tk8.6 (8.6.4+dfsg-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Tue, 05 May 2015 14:35:20 +0300
+
+tk8.6 (8.6.4+dfsg-1) experimental; urgency=medium
+
+  * New upstream release.
+  * Upload to experimental because of the jessie freeze.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 13 Mar 2015 13:51:24 +0300
+
+tk8.6 (8.6.3+dfsg-1) experimental; urgency=medium
+
+  * New upstream release.
+  * Upload to experimental because of the jessie freeze.
+  * Bumped standards version to 3.9.6.
+  * Removed non-free image library/images/lamp.svg from the source code.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 09 Mar 2015 11:38:34 +0300
+
+tk8.6 (8.6.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refreshed patches.
+  * Removed patch which fixed freeing fonts on exit because it has been
+    applied upstream.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Wed, 27 Aug 2014 23:06:29 +0400
+
+tk8.6 (8.6.1-6) unstable; urgency=low
+
+  * Added patch from upstream which fixes freeing fonts on exit (thanks
+    to Adam Conrad <adconrad@ubuntu.com> for picking it up, closes: #755195).
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 18 Jul 2014 22:51:01 +0400
+
+tk8.6 (8.6.1-5) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 08 Mar 2014 08:56:59 +0400
+
+tk8.6 (8.6.1-4) experimental; urgency=low
+
+  * Restored tk8.6 prerm script which removes alternative for /usr/bin/wish.
+  * Added ${misc:Depends} substvar for libtk8.6-dbg package.
+  * Bumped standards version to 3.9.5.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 10 Jan 2014 13:00:35 +0400
+
+tk8.6 (8.6.1-3) experimental; urgency=low
+
+  * Added the libtk8.6-dbg package with libtk8.6 debug symbols in it.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 05 Oct 2013 11:59:47 +0400
+
+tk8.6 (8.6.1-2) experimental; urgency=low
+
+  * Renamed the development package back to tk8.6-dev after a discussion
+    on debian-devel mailing list.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Wed, 25 Sep 2013 22:08:28 +0400
+
+tk8.6 (8.6.1-1) experimental; urgency=low
+
+  * New upstream release.
+  * Make tk8.6-doc replace tk8.6 because of moving the
+    /usr/share/tcltk/tk8.6/demos link.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Tue, 24 Sep 2013 20:23:15 +0400
+
+tk8.6 (8.6.0-4) experimental; urgency=low
+
+  * Removed unnecessary patch to tkPort.h.
+  * Make libtk8.6-dev depend on tk8.6 for better backward compatibility.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 19 Aug 2013 21:25:44 +0400
+
+tk8.6 (8.6.0-3) experimental; urgency=low
+
+  * Renamed tk8.6-lib and tk8.6-dev packages to libtk8.6 and libtk8.6-dev
+    because the latter is a much more common naming scheme.
+  * Added conflict with older tk8.6 to the tk8.6-doc package (a link to
+    Tk demos was moved from one package to the other).
+  * Fixed the maintainer 'name'.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Wed, 31 Jul 2013 12:01:00 +0400
+
+tk8.6 (8.6.0-2) experimental; urgency=low
+
+  * Bumped debhelper compatibility version to 9.
+  * Added multi-arch support. This includes splitting out the tk8.6-lib
+    library package with libtk8.6.so and tkConfig.sh moved into a
+    multi-archified location.
+  * Recreated /usr/lib/tk8.6/tkConfig.sh for backward compatibility (intend
+    to remove in the future).
+  * Removed .0 suffix from the libtk8.6.so library in order to remove
+    unnecessary diversions from the upstream practice, provided the symlink
+    for backward compatibility (intend to remove in the future).
+  * Switched to calculating dependency on libtk8.6 via a symbols table.
+  * Don't use the alternatives mechanism for selecting /usr/bin/wish. This
+    package ships only /usr/bin/wish8.6. The tcltk-defaults package provides
+    the necessary symlink. This also means that tk8.6 does no longer provide
+    the wish virtual package.
+  * Moved the old changelog to the tk8.6-doc package to reduce size of the
+    tk8.6 one.
+  * Moved the Tk demos to the tk8.6-doc package.
+  * Fixed clean target in debian/rules.
+  * Bumped standards version to 3.9.4.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Tue, 30 Jul 2013 20:27:35 +0400
+
+tk8.6 (8.6.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 21 Dec 2012 08:34:11 +0400
+
+tk8.6 (8.6.0~b3-1) experimental; urgency=low
+
+  * New upstream beta release.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 21 Sep 2012 08:49:05 +0400
+
+tk8.6 (8.6.0~b2-2) experimental; urgency=low
+
+  * Fixed options(3tk) manpage.
+  * Install FontId(3tk) and MeasureChar(3tk) manpages because they are
+    referenced in the other manpages.
+  * Fixed references to tclvars manpage.
+  * Removed Chris Waters wrom the uploaders list (closes: #664118).
+  * Switched to 3.0 (quilt) source package format.
+  * Bumped debhelper compatibility version to 8.
+  * Added hardening build flags using dpkg-buildflags.
+  * Bumped standards version to 3.9.3.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Tue, 29 May 2012 20:44:31 +0400
+
+tk8.6 (8.6.0~b2-1) experimental; urgency=low
+
+  * New upstream beta release.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 08 Aug 2011 23:12:55 +0400
+
+tk8.6 (8.6.0~b2~rc4-1) experimental; urgency=low
+
+  * New upstream beta release candidate.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sun, 07 Aug 2011 12:30:32 +0400
+
+tk8.6 (8.6.0~b2~rc0-1) experimental; urgency=low
+
+  * New upstream beta release candidate.
+  * Moved /usr/share/tcltk/tk8.6/tkConfig.sh back to the /usr/lib/tk8.6
+  * Fixed Xft detection in configure script, which is broken since xft-config
+    was removed from the libxft-dev package.
+  * Added README.source which explains how to apply quilt patches.
+  * Bumped standards version to 3.9.2.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Thu, 21 Jul 2011 10:31:32 +0400
+
+tk8.6 (8.6.0~b1-3) experimental; urgency=low
+
+  * Added libxft-dev to tk8.6-dev dependencies because -lXft is stored in
+    tkConfig.sh configuration script.
+  * Replaced xterm by xvt in recommended dependencies to reduce implicit
+    dependencies list.
+  * Added ${misc:Depends} to debian/control file because the binary packages
+    are built using debhelper.
+  * Bumped standards version to 3.9.1.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sun, 31 Oct 2010 14:58:40 +0300
+
+tk8.6 (8.6.0~b1-2) experimental; urgency=low
+
+  * Don't remove wish alternative in case of package upgrade because the
+    manually installed alternative is also removed which isn't desirable.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sun, 01 Mar 2009 10:39:30 +0300
+
+tk8.6 (8.6.0~b1-1) experimental; urgency=low
+
+  * New upstream beta release.
+  * Added private ttk headers to tk8.6-dev binary package.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 27 Dec 2008 14:39:54 +0300
+
+tk8.6 (8.6.0~a3-1) experimental; urgency=low
+
+  * New upstream alpha release.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 11 Oct 2008 02:19:43 +0400
+
+tk8.6 (8.6.0~a2-1) experimental; urgency=low
+
+  * New upstream alpha release.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 23 Aug 2008 12:35:08 +0400
+
+tk8.6 (8.6.0~a1-1) experimental; urgency=low
+
+  * Initial alpha release (closes: #488655).
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 30 Jun 2008 15:57:54 +0400
+

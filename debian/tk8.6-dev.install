@@ -1,0 +1,5 @@
+usr/include
+usr/lib/*/*.a
+usr/lib/*/tk*/*.sh
+usr/lib/*/pkgconfig
+debian/tkConfig.sh	usr/lib/tk8.6
