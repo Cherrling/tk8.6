@@ -6,7 +6,7 @@
  *	to generate appropriate enter/leave events, and to update the global
  *	grab window information.
  *
- * Copyright (c) 1996 by Sun Microsystems, Inc.
+ * Copyright (c) 1996 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -182,7 +182,7 @@ GenerateEnterLeave(
 		 */
 
 		InitializeEvent(&event, targetPtr, LeaveNotify, x, y, state,
-			NotifyNormal);
+			NotifyAncestor);
 
 		TkInOutEvents(&event, lastWinPtr, winPtr, LeaveNotify,
 			EnterNotify, TCL_QUEUE_TAIL);
@@ -387,7 +387,7 @@ Tk_UpdatePointer(
 
 	if (targetWinPtr != NULL) {
 	    InitializeEvent(&event, targetWinPtr, MotionNotify, x, y,
-		    tsdPtr->lastState, NotifyNormal);
+		    tsdPtr->lastState, NotifyAncestor);
 	    Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
 	}
 	tsdPtr->lastPos = pos;
@@ -428,7 +428,7 @@ XGrabPointer(
     ThreadSpecificData *tsdPtr =
 	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    display->request++;
+    LastKnownRequestProcessed(display)++;
     tsdPtr->grabWinPtr = (TkWindow *) Tk_IdToWindow(display, grab_window);
     tsdPtr->restrictWinPtr = NULL;
     TkpSetCapture(tsdPtr->grabWinPtr);
@@ -463,7 +463,7 @@ XUngrabPointer(
     ThreadSpecificData *tsdPtr =
 	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    display->request++;
+    LastKnownRequestProcessed(display)++;
     tsdPtr->grabWinPtr = NULL;
     tsdPtr->restrictWinPtr = NULL;
     TkpSetCapture(NULL);
@@ -590,7 +590,7 @@ XDefineCursor(
     if (tsdPtr->cursorWinPtr == winPtr) {
 	UpdateCursor(winPtr);
     }
-    display->request++;
+    LastKnownRequestProcessed(display)++;
     return Success;
 }
 

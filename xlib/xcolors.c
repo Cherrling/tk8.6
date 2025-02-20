@@ -4,8 +4,8 @@
  *	This file contains the routines used to map from X color names to RGB
  *	and pixel values.
  *
- * Copyright (c) 1996 by Sun Microsystems, Inc.
- * Copyright (c) 2012 by Jan Nijtmans
+ * Copyright (c) 1996 Sun Microsystems, Inc.
+ * Copyright (c) 2012 Jan Nijtmans
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -306,7 +306,7 @@ colorcmp(
 	    c += 'a' - 'A';
 	} else if (((unsigned)(c - '1') <= (unsigned)('9' - '1'))) {
 	    if (d == '0') {
-	    	d += 10;
+		d += 10;
 	    } else if (!d) {
 		num = c - '0';
 		while ((unsigned)((c = *spec++) - '0') <= (unsigned)('9' - '0')) {
@@ -336,8 +336,8 @@ colorcmp(
 
 Status
 XParseColor(
-    Display *display,
-    Colormap map,
+    TCL_UNUSED(Display *),
+    TCL_UNUSED(Colormap),
     const char *spec,
     XColor *colorPtr)
 {
@@ -414,11 +414,11 @@ XParseColor(
 	}
 	if (num > (*p)[31]) {
 	    if (((*p)[31] != 8) || num > 100) {
-	    	return 0;
+		return 0;
 	    }
 	    num = (num * 255 + 50) / 100;
 	    if ((num == 230) || (num == 128)) {
-	    	/*
+		/*
 		 * Those two entries have a deviation i.r.t the table.
 		 */
 

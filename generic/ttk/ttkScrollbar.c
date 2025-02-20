@@ -34,12 +34,12 @@ typedef struct
 static Tk_OptionSpec ScrollbarOptionSpecs[] =
 {
     {TK_OPTION_STRING, "-command", "command", "Command", "",
-	Tk_Offset(Scrollbar,scrollbar.commandObj), -1, 0,0,0},
+	Tk_Offset(Scrollbar,scrollbar.commandObj), -1, 0, 0, 0},
 
     {TK_OPTION_STRING_TABLE, "-orient", "orient", "Orient", "vertical",
 	Tk_Offset(Scrollbar,scrollbar.orientObj),
 	Tk_Offset(Scrollbar,scrollbar.orient),
-	0, (void *)ttkOrientStrings, STYLE_CHANGED },
+	0, ttkOrientStrings, STYLE_CHANGED },
 
     WIDGET_TAKEFOCUS_FALSE,
     WIDGET_INHERIT_OPTIONS(ttkCoreOptionSpecs)
@@ -50,10 +50,11 @@ static Tk_OptionSpec ScrollbarOptionSpecs[] =
  */
 
 static void
-ScrollbarInitialize(Tcl_Interp *dummy, void *recordPtr)
+ScrollbarInitialize(
+    TCL_UNUSED(Tcl_Interp *),
+    void *recordPtr)
 {
     Scrollbar *sb = (Scrollbar *)recordPtr;
-    (void)dummy;
 
     sb->scrollbar.first = 0.0;
     sb->scrollbar.last = 1.0;
@@ -330,8 +331,8 @@ TTK_END_LAYOUT
  * +++ Initialization.
  */
 
-MODULE_SCOPE
-void TtkScrollbar_Init(Tcl_Interp *interp)
+MODULE_SCOPE void
+TtkScrollbar_Init(Tcl_Interp *interp)
 {
     Ttk_Theme theme = Ttk_GetDefaultTheme(interp);
 

@@ -16,6 +16,10 @@
 
 #include "tkInt.h"
 
+#ifdef _WIN32
+#include "tkWinInt.h"
+#endif
+
 /*
  * The maximum amount of memory to allocate for data read from the file. If we
  * need more than this, we do it in pieces.
@@ -141,7 +145,8 @@ FileReadPPM(
 				 * image being read. */
 {
     int fileWidth, fileHeight, maxIntensity;
-    int nLines, nBytes, h, type, count, bytesPerChannel = 1;
+    int nLines, h, type, bytesPerChannel = 1;
+    int nBytes, count;
     unsigned char *pixelPtr;
     Tk_PhotoImageBlock block;
 
@@ -240,7 +245,7 @@ FileReadPPM(
 	    unsigned char *p;
 	    unsigned int value;
 
-	    for (p = pixelPtr; count > 0; count--, p += 2) {
+	    for (p = pixelPtr; count > 0; count -= 2, p += 2) {
 		value = ((unsigned int) p[0]) * 256 + ((unsigned int) p[1]);
 		value = value * 255 / maxIntensity;
 		p[0] = p[1] = (unsigned char) value;
@@ -299,13 +304,8 @@ FileWritePPM(
 	Tcl_Close(NULL, chan);
 	return TCL_ERROR;
     }
-    if (Tcl_SetChannelOption(interp, chan, "-encoding", "binary")
-	    != TCL_OK) {
-	Tcl_Close(NULL, chan);
-	return TCL_ERROR;
-    }
 
-    sprintf(header, "P6\n%d %d\n255\n", blockPtr->width, blockPtr->height);
+    snprintf(header, sizeof(header), "P6\n%d %d\n255\n", blockPtr->width, blockPtr->height);
     Tcl_Write(chan, header, -1);
 
     pixLinePtr = blockPtr->pixelPtr + blockPtr->offset[0];
@@ -322,7 +322,7 @@ FileWritePPM(
 	for (h = blockPtr->height; h > 0; h--) {
 	    pixelPtr = pixLinePtr;
 	    for (w = blockPtr->width; w > 0; w--) {
-		if (    Tcl_Write(chan,(char *)&pixelPtr[0], 1) == -1 ||
+		if (Tcl_Write(chan,(char *)&pixelPtr[0], 1) == -1 ||
 			Tcl_Write(chan,(char *)&pixelPtr[greenOffset],1) == -1 ||
 			Tcl_Write(chan,(char *)&pixelPtr[blueOffset],1) == -1) {
 		    goto writeerror;
@@ -376,7 +376,7 @@ StringWritePPM(
     char header[16 + TCL_INTEGER_SPACE * 2];
     Tcl_Obj *byteArrayObj;
 
-    sprintf(header, "P6\n%d %d\n255\n", blockPtr->width, blockPtr->height);
+    snprintf(header, sizeof(header), "P6\n%d %d\n255\n", blockPtr->width, blockPtr->height);
 
     /*
      * Construct a byte array of the right size with the header and
@@ -602,8 +602,8 @@ StringReadPPM(
 	} else {
 	    unsigned int value;
 
-	    for (p = pixelPtr,count=nBytes; count > 1; count-=2, p += 2) {
-		value = ((unsigned int) p[0]) * 256 + ((unsigned int) p[1]);
+	    for (p = pixelPtr,count=nBytes; count > 1; count-=2, p += 2, dataBuffer += 2) {
+		value = ((unsigned int)dataBuffer[0]) * 256 + ((unsigned int)dataBuffer[1]);
 		value = value * 255 / maxIntensity;
 		p[0] = p[1] = (unsigned char) value;
 	    }
@@ -761,7 +761,8 @@ ReadPPMStringHeader(
 {
 #define BUFFER_SIZE 1000
     char buffer[BUFFER_SIZE], c;
-    int i, numFields, dataSize, type = 0;
+    int i, numFields, type = 0;
+    int dataSize;
     unsigned char *dataBuffer;
 
     dataBuffer = Tcl_GetByteArrayFromObj(dataPtr, &dataSize);

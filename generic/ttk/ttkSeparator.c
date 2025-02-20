@@ -26,7 +26,7 @@ static Tk_OptionSpec SeparatorOptionSpecs[] = {
     {TK_OPTION_STRING_TABLE, "-orient", "orient", "Orient", "horizontal",
 	Tk_Offset(Separator,separator.orientObj),
 	Tk_Offset(Separator,separator.orient),
-	0, (void *)ttkOrientStrings, STYLE_CHANGED },
+	0, ttkOrientStrings, STYLE_CHANGED },
 
     WIDGET_TAKEFOCUS_FALSE,
     WIDGET_INHERIT_OPTIONS(ttkCoreOptionSpecs)
@@ -120,8 +120,8 @@ TTK_END_LAYOUT
 /* +++ Initialization:
  */
 
-MODULE_SCOPE
-void TtkSeparator_Init(Tcl_Interp *interp)
+MODULE_SCOPE void
+TtkSeparator_Init(Tcl_Interp *interp)
 {
     Ttk_Theme theme = Ttk_GetDefaultTheme(interp);
 

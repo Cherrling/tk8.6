@@ -642,6 +642,9 @@ declare 185 macosx {
 declare 186 macosx {
     int TkpWillDrawWidget(Tk_Window tkwin)
 }
+declare 187 {
+    void TkUnusedStubEntry(void)
+}
 
 
 ##############################################################################
@@ -1332,12 +1335,10 @@ declare 80 win {
 	    Drawable d, GC gc, XImage *image, int src_x, int src_y,
 	    int dest_x, int dest_y, unsigned int width, unsigned int height)
 }
-# This slot is reserved for use by the clipping rectangle patch:
-#  declare 81 win {
-#      XSetClipRectangles(Display *display, GC gc, int clip_x_origin,
-#  	    int clip_y_origin, XRectangle rectangles[], int n, int ordering)
-#  }
-
+declare 81 win {
+    int XSetClipRectangles(Display *display, GC gc, int clip_x_origin,
+	    int clip_y_origin, XRectangle rectangles[], int n, int ordering)
+}
 declare 82 win {
     Status XParseColor(Display *display, Colormap map,
           _Xconst char *spec, XColor *colorPtr)
@@ -1829,7 +1830,6 @@ declare 106 aqua {
     int XSetClipRectangles(Display *display, GC gc, int clip_x_origin,
        int clip_y_origin, XRectangle rectangles[], int n, int ordering)
 }
-
 declare 107 aqua {
     int XFlush(Display *display)
 }

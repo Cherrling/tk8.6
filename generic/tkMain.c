@@ -16,20 +16,22 @@
 
 #include "tkInt.h"
 
-extern int TkCygwinMainEx(int, char **, Tcl_AppInitProc *, Tcl_Interp *);
+#if defined(_WIN32) && !defined(UNICODE) && !defined(STATIC_BUILD)
+MODULE_SCOPE void TkCygwinMainEx(int, char **, Tcl_AppInitProc *, Tcl_Interp *);
+#endif
 
 /*
  * The default prompt used when the user has not overridden it.
  */
 
 static const char DEFAULT_PRIMARY_PROMPT[] = "% ";
+static const char ENCODING_ERROR[] = "\n\t(encoding error in stderr)";
 
 /*
- * This file can be compiled on Windows in UNICODE mode, as well as
- * on all other platforms using the native encoding. This is done
- * by using the normal Windows functions like _tcscmp, but on
- * platforms which don't have <tchar.h> we have to translate that
- * to strcmp here.
+ * This file can be compiled on Windows in UNICODE mode, as well as on all
+ * other platforms using the native encoding. This is done by using the normal
+ * Windows functions like _tcscmp, but on platforms which don't have <tchar.h>
+ * we have to translate that to strcmp here.
  */
 #ifdef _WIN32
 #ifdef __cplusplus
@@ -67,21 +69,23 @@ NewNativeObj(
 {
     Tcl_Obj *obj;
     Tcl_DString ds;
+    const char *str;
 
 #if defined(_WIN32) && defined(UNICODE)
     Tcl_DStringInit(&ds);
     Tcl_WCharToUtfDString(string, wcslen(string), &ds);
+    str = Tcl_DStringValue(&ds);
 #else
-    Tcl_ExternalToUtfDString(NULL, (char *) string, -1, &ds);
+    str = Tcl_ExternalToUtfDString(NULL, (char *)string, strlen(string), &ds);
 #endif
-    obj = Tcl_NewStringObj(Tcl_DStringValue(&ds), Tcl_DStringLength(&ds));
+    obj = Tcl_NewStringObj(str, Tcl_DStringLength(&ds));
     Tcl_DStringFree(&ds);
     return obj;
 }
 
 /*
  * Declarations for various library functions and variables (don't want to
- * include tkInt.h or tkPort.h here, because people might copy this file out
+ * include tclInt.h or tclPort.h here, because people might copy this file out
  * of the Tk source directory to make their own modified versions). Note: do
  * not declare "exit" here even though a declaration is really needed, because
  * it will conflict with a declaration elsewhere on some systems.
@@ -118,7 +122,7 @@ static int WinIsTty(int fd) {
 extern int		isatty(int fd);
 #endif
 
-typedef struct InteractiveState {
+typedef struct {
     Tcl_Channel input;		/* The standard input channel from which lines
 				 * are read. */
     int tty;			/* Non-zero means standard input is a
@@ -138,7 +142,7 @@ typedef struct InteractiveState {
  */
 
 static void		Prompt(Tcl_Interp *interp, InteractiveState *isPtr);
-static void		StdinProc(ClientData clientData, int mask);
+static void		StdinProc(void *clientData, int mask);
 
 /*
  *----------------------------------------------------------------------
@@ -159,7 +163,7 @@ static void		StdinProc(ClientData clientData, int mask);
  *----------------------------------------------------------------------
  */
 
-void
+TCL_NORETURN1 void
 Tk_MainEx(
     int argc,			/* Number of arguments. */
     TCHAR **argv,		/* Array of argument strings. */
@@ -169,11 +173,17 @@ Tk_MainEx(
 				 * but before starting to execute commands. */
     Tcl_Interp *interp)
 {
+    int i=0;			/* argv[i] index */
     Tcl_Obj *path, *argvPtr, *appName;
     const char *encodingName;
     int code, nullStdin = 0;
     Tcl_Channel chan;
     InteractiveState is;
+
+    if (0 < argc) {
+	--argc;			/* "consume" argv[0] */
+	++i;
+    }
 
     /*
      * Ensure that we are getting a compatible version of Tcl.
@@ -196,15 +206,13 @@ Tk_MainEx(
 	 * Tk_MainEx function of libtk8.?.dll, not this one. */
 	if (Tcl_GetVar2(interp, "env", "DISPLAY", TCL_GLOBAL_ONLY)) {
 	loadCygwinTk:
-	    if (TkCygwinMainEx(argc, argv, appInitProc, interp)) {
-		/* Should never reach here. */
-		return;
-	    }
+	    TkCygwinMainEx(argc, argv, appInitProc, interp);
+	    /* Only returns when Tk_MainEx() was not found */
 	} else {
-	    int i;
+	    int j;
 
-	    for (i = 1; i < argc; ++i) {
-		if (!_tcscmp(argv[i], TEXT("-display"))) {
+	    for (j = 1; j < argc; ++j) {
+		if (!strcmp(argv[j], "-display")) {
 		    goto loadCygwinTk;
 		}
 	    }
@@ -250,23 +258,24 @@ Tk_MainEx(
 	 *  -file FILENAME		(ancient history support only)
 	 */
 
-	if ((argc > 3) && (0 == _tcscmp(TEXT("-encoding"), argv[1]))
-		&& (TEXT('-') != argv[3][0])) {
+	/* mind argc is being adjusted as we proceed */
+	if ((argc >= 3) && (0 == _tcscmp(TEXT("-encoding"), argv[1]))
+		&& ('-' != argv[3][0])) {
 	    Tcl_Obj *value = NewNativeObj(argv[2]);
 	    Tcl_SetStartupScript(NewNativeObj(argv[3]), Tcl_GetString(value));
 	    Tcl_DecrRefCount(value);
 	    argc -= 3;
-	    argv += 3;
-	} else if ((argc > 1) && (TEXT('-') != argv[1][0])) {
+	    i += 3;
+	} else if ((argc >= 1) && ('-' != argv[1][0])) {
 	    Tcl_SetStartupScript(NewNativeObj(argv[1]), NULL);
 	    argc--;
-	    argv++;
-	} else if ((argc > 2) && (length = _tcslen(argv[1]))
+	    i++;
+	} else if ((argc >= 2) && (length = _tcslen(argv[1]))
 		&& (length > 1) && (0 == _tcsncmp(TEXT("-file"), argv[1], length))
-		&& (TEXT('-') != argv[2][0])) {
+		&& ('-' != argv[2][0])) {
 	    Tcl_SetStartupScript(NewNativeObj(argv[2]), NULL);
 	    argc -= 2;
-	    argv += 2;
+	    i += 2;
 	}
     }
 
@@ -277,14 +286,12 @@ Tk_MainEx(
 	appName = path;
     }
     Tcl_SetVar2Ex(interp, "argv0", NULL, appName, TCL_GLOBAL_ONLY);
-    argc--;
-    argv++;
 
     Tcl_SetVar2Ex(interp, "argc", NULL, Tcl_NewIntObj(argc), TCL_GLOBAL_ONLY);
 
     argvPtr = Tcl_NewListObj(0, NULL);
     while (argc--) {
-	Tcl_ListObjAppendElement(NULL, argvPtr, NewNativeObj(*argv++));
+	Tcl_ListObjAppendElement(NULL, argvPtr, NewNativeObj(argv[i++]));
     }
     Tcl_SetVar2Ex(interp, "argv", NULL, argvPtr, TCL_GLOBAL_ONLY);
 
@@ -307,7 +314,7 @@ Tk_MainEx(
     }
 #endif
     Tcl_SetVar2Ex(interp, "tcl_interactive", NULL,
-	    Tcl_NewIntObj(!path && (is.tty || nullStdin)), TCL_GLOBAL_ONLY);
+	    Tcl_NewBooleanObj(!path && (is.tty || nullStdin)), TCL_GLOBAL_ONLY);
 
     /*
      * Invoke application-specific initialization.
@@ -402,25 +409,30 @@ Tk_MainEx(
 
 static void
 StdinProc(
-    ClientData clientData,	/* The state of interactive cmd line */
+    void *clientData,	/* The state of interactive cmd line */
     int mask)			/* Not used. */
 {
     char *cmd;
     int code;
-    int count;
+    int length;
     InteractiveState *isPtr = (InteractiveState *)clientData;
     Tcl_Channel chan = isPtr->input;
     Tcl_Interp *interp = isPtr->interp;
     (void)mask;
 
-    count = Tcl_Gets(chan, &isPtr->line);
+    length = Tcl_Gets(chan, &isPtr->line);
 
-    if ((count == -1) && !isPtr->gotPartial) {
+    if ((length < 0) && !isPtr->gotPartial) {
 	if (isPtr->tty) {
+	    /*
+	     * Would be better to find a way to exit the mainLoop? Or perhaps
+	     * evaluate [exit]? Leaving as is for now due to compatibility
+	     * concerns.
+	     */
+
 	    Tcl_Exit(0);
-	} else {
-	    Tcl_DeleteChannelHandler(chan, StdinProc, isPtr);
 	}
+	Tcl_DeleteChannelHandler(chan, StdinProc, isPtr);
 	return;
     }
 
@@ -442,20 +454,33 @@ StdinProc(
 
     Tcl_CreateChannelHandler(chan, 0, StdinProc, isPtr);
     code = Tcl_RecordAndEval(interp, cmd, TCL_EVAL_GLOBAL);
-
-    isPtr->input = Tcl_GetStdChannel(TCL_STDIN);
-    if (isPtr->input) {
-	Tcl_CreateChannelHandler(isPtr->input, TCL_READABLE, StdinProc, isPtr);
+    isPtr->input = chan = Tcl_GetStdChannel(TCL_STDIN);
+    if (chan != NULL) {
+	Tcl_CreateChannelHandler(chan, TCL_READABLE, StdinProc, isPtr);
     }
     Tcl_DStringFree(&isPtr->command);
-    if (Tcl_GetString(Tcl_GetObjResult(interp))[0] != '\0') {
-	if ((code != TCL_OK) || (isPtr->tty)) {
-	    chan = Tcl_GetStdChannel((code != TCL_OK) ? TCL_STDERR : TCL_STDOUT);
-	    if (chan) {
-		Tcl_WriteObj(chan, Tcl_GetObjResult(interp));
-		Tcl_WriteChars(chan, "\n", 1);
+    if (code != TCL_OK) {
+	chan = Tcl_GetStdChannel(TCL_STDERR);
+
+	if (chan != NULL) {
+	    if (Tcl_WriteObj(chan, Tcl_GetObjResult(interp)) < 0) {
+		Tcl_WriteChars(chan, ENCODING_ERROR, -1);
 	    }
+	    Tcl_WriteChars(chan, "\n", 1);
 	}
+    } else if (isPtr->tty) {
+	Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
+	chan = Tcl_GetStdChannel(TCL_STDOUT);
+
+	Tcl_IncrRefCount(resultPtr);
+	(void)Tcl_GetStringFromObj(resultPtr, &length);
+	if ((length > 0) && (chan != NULL)) {
+	    if (Tcl_WriteObj(chan, resultPtr) < 0) {
+		Tcl_WriteChars(chan, "\n\t(encoding error in stdout)", -1);
+	    }
+	    Tcl_WriteChars(chan, "\n", 1);
+	}
+	Tcl_DecrRefCount(resultPtr);
     }
 
     /*
@@ -511,12 +536,12 @@ Prompt(
 	if (code != TCL_OK) {
 	    Tcl_AddErrorInfo(interp,
 		    "\n    (script that generates prompt)");
-	    if (Tcl_GetString(Tcl_GetObjResult(interp))[0] != '\0') {
-		chan = Tcl_GetStdChannel(TCL_STDERR);
-		if (chan != NULL) {
-		    Tcl_WriteObj(chan, Tcl_GetObjResult(interp));
-		    Tcl_WriteChars(chan, "\n", 1);
-		}
+	    chan = Tcl_GetStdChannel(TCL_STDERR);
+	    if (chan != NULL) {
+	    if (Tcl_WriteObj(chan, Tcl_GetObjResult(interp)) < 0) {
+		Tcl_WriteChars(chan, ENCODING_ERROR, -1);
+	    }
+		Tcl_WriteChars(chan, "\n", 1);
 	    }
 	    goto defaultPrompt;
 	}

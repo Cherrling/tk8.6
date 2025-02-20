@@ -4,10 +4,10 @@
  *	This file defines the routines for both creating and handling Window
  *	Manager class events for Tk.
  *
- * Copyright 2001-2009, Apple Inc.
- * Copyright (c) 2005-2009 Daniel A. Steffen <das@users.sourceforge.net>
- * Copyright (c) 2015 Kevin Walzer/WordTech Communications LLC.
- * Copyright (c) 2015 Marc Culler.
+ * Copyright © 2001-2009 Apple Inc.
+ * Copyright © 2005-2009 Daniel A. Steffen <das@users.sourceforge.net>
+ * Copyright © 2015 Kevin Walzer/WordTech Communications LLC.
+ * Copyright © 2015 Marc Culler.
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -50,22 +50,42 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
 - (void) windowActivation: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
-    BOOL activate = [[notification name]
-	    isEqualToString:NSWindowDidBecomeKeyNotification];
     NSWindow *w = [notification object];
     TkWindow *winPtr = TkMacOSXGetTkWindow(w);
+    NSString *name = [notification name];
+    Bool flag = [name isEqualToString:NSWindowDidBecomeKeyNotification];
+    if (winPtr && flag) {
+	NSPoint location = [NSEvent mouseLocation];
+	int x = location.x;
+	int y = floor(TkMacOSXZeroScreenHeight() - location.y);
+	/*
+	 * The Tk event target persists when there is no key window but
+	 * gets reset when a new window becomes the key window.
+	 */
 
+	[NSApp setTkEventTarget: winPtr];
+
+	/*
+	 * Call Tk_UpdatePointer if the pointer is in the window.
+	 */
+
+	NSView *view = [w contentView];
+	NSPoint viewLocation = [view convertPoint:location fromView:nil];
+	if (NSPointInRect(viewLocation, NSInsetRect([view bounds], 2, 2))) {
+	    Tk_UpdatePointer((Tk_Window) winPtr, x, y, [NSApp tkButtonState]);
+	}
+    }
     if (winPtr && Tk_IsMapped(winPtr)) {
-	GenerateActivateEvents(winPtr, activate);
+	GenerateActivateEvents(winPtr, flag);
     }
 }
 
 - (void) windowBoundsChanged: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     BOOL movedOnly = [[notification name]
 	    isEqualToString:NSWindowDidMoveNotification];
@@ -103,7 +123,7 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
 - (void) windowExpanded: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     NSWindow *w = [notification object];
     TkWindow *winPtr = TkMacOSXGetTkWindow(w);
@@ -160,7 +180,7 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
 - (void) windowEnteredFullScreen: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     if (![[notification object] respondsToSelector: @selector (tkLayoutChanged)]) {
 	return;
@@ -171,7 +191,7 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
 - (void) windowExitedFullScreen: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     if (![[notification object] respondsToSelector: @selector (tkLayoutChanged)]) {
 	return;
@@ -182,12 +202,13 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
 - (void) windowCollapsed: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     NSWindow *w = [notification object];
     TkWindow *winPtr = TkMacOSXGetTkWindow(w);
 
     if (winPtr) {
+	winPtr->wmInfoPtr->hints.initial_state = IconicState;
 	Tk_UnmapWindow((Tk_Window)winPtr);
     }
 }
@@ -195,7 +216,7 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
 - (BOOL) windowShouldClose: (NSWindow *) w
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, w);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), w);
 #endif
     TkWindow *winPtr = TkMacOSXGetTkWindow(w);
 
@@ -218,8 +239,8 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
     if (winPtr) {
 	TKContentView *view = [window contentView];
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101500
-	if (@available(macOS 10.15, *)) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+	if (@available(macOS 10.14, *)) {
 	    [view viewDidChangeEffectiveAppearance];
 	}
 #endif
@@ -239,22 +260,27 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
     }
 }
 
+- (void) windowLiveResize: (NSNotification *) notification
+{
+    NSString *name = [notification name];
+    if ([name isEqualToString:NSWindowWillStartLiveResizeNotification]) {
+	// printf("Starting live resize.\n");
+    } else if ([name isEqualToString:NSWindowDidEndLiveResizeNotification]) {
+	[self setTkLiveResizeEnded:YES];
+	// printf("Ending live resize\n");
+    }
+}
+
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
 
 - (void) windowDragStart: (NSNotification *) notification
 {
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
-}
-
-- (void) windowLiveResize: (NSNotification *) notification
-{
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
-    //BOOL start = [[notification name] isEqualToString:NSWindowWillStartLiveResizeNotification];
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 }
 
 - (void) windowUnmapped: (NSNotification *) notification
 {
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
     NSWindow *w = [notification object];
     TkWindow *winPtr = TkMacOSXGetTkWindow(w);
 
@@ -280,16 +306,16 @@ extern NSString *NSWindowDidOrderOffScreenNotification;
     observe(NSWindowDidMiniaturizeNotification, windowCollapsed:);
     observe(NSWindowWillOrderOnScreenNotification, windowMapped:);
     observe(NSWindowDidOrderOnScreenNotification, windowBecameVisible:);
+    observe(NSWindowWillStartLiveResizeNotification, windowLiveResize:);
+    observe(NSWindowDidEndLiveResizeNotification, windowLiveResize:);
 
-#if !(MAC_OS_X_VERSION_MAX_ALLOWED < 1070)
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
     observe(NSWindowDidEnterFullScreenNotification, windowEnteredFullScreen:);
     observe(NSWindowDidExitFullScreenNotification, windowExitedFullScreen:);
 #endif
 
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
     observe(NSWindowWillMoveNotification, windowDragStart:);
-    observe(NSWindowWillStartLiveResizeNotification, windowLiveResize:);
-    observe(NSWindowDidEndLiveResizeNotification, windowLiveResize:);
     observe(NSWindowDidOrderOffScreenNotification, windowUnmapped:);
 #endif
 #undef observe
@@ -316,7 +342,7 @@ static void RefocusGrabWindow(void *data) {
     (void)notification;
 
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     [NSApp tkCheckPasteboard];
 
@@ -336,7 +362,7 @@ static void RefocusGrabWindow(void *data) {
 	    continue;
 	}
 	if (winPtr->wmInfoPtr->hints.initial_state == WithdrawnState) {
-	    [win orderOut:nil];
+	    [win orderOut:NSApp];
 	}
 	if (winPtr->dispPtr->grabWinPtr == winPtr) {
 	    Tcl_DoWhenIdle(RefocusGrabWindow, winPtr);
@@ -351,7 +377,7 @@ static void RefocusGrabWindow(void *data) {
     (void)notification;
 
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
 
     /*
@@ -389,7 +415,7 @@ static void RefocusGrabWindow(void *data) {
 - (void) applicationShowHide: (NSNotification *) notification
 {
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     const char *cmd = ([[notification name] isEqualToString:
 	    NSApplicationDidUnhideNotification] ?
@@ -410,7 +436,7 @@ static void RefocusGrabWindow(void *data) {
     (void)notification;
 
 #ifdef TK_MAC_DEBUG_NOTIFICATIONS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, notification);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), notification);
 #endif
     TkDisplay *dispPtr = TkGetDisplayList();
 
@@ -431,7 +457,7 @@ static void RefocusGrabWindow(void *data) {
  *      being run inside of the drawRect method. If not, it may be desirable
  *      for the display procedure to simply clear the REDRAW_PENDING flag
  *      and return.  The widget can be recorded in order to schedule a
- *      redraw, via and Expose event, from within drawRect.
+ *      redraw, via an Expose event, from within drawRect.
  *
  *      This is also needed for some tests, especially of the Text widget,
  *      which record data in a global Tcl variable and assume that display
@@ -960,6 +986,16 @@ ConfigureRestrictProc(
 	 */
 
 	self.layer.delegate = (id) self;
+	trackingArea = [[NSTrackingArea alloc]
+			   initWithRect:[self bounds]
+				options:(NSTrackingMouseEnteredAndExited |
+					 NSTrackingMouseMoved |
+					 NSTrackingEnabledDuringMouseDrag |
+					 NSTrackingInVisibleRect |
+					 NSTrackingActiveAlways)
+				  owner:self
+			       userInfo:nil];
+        [self addTrackingArea:trackingArea];
     }
     return self;
 }
@@ -973,18 +1009,20 @@ ConfigureRestrictProc(
     return NO;
 }
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
 - (void) viewDidChangeBackingProperties
 {
 
     /*
      * Make sure that the layer uses a contentScale that matches the
-     * backing scale factor of the screen.  This avoids blurry text whe
+     * backing scale factor of the screen.  This avoids blurry text when
      * the view is on a Retina display, as well as incorrect size when
      * the view is on a normal display.
      */
 
     self.layer.contentsScale = self.window.screen.backingScaleFactor;
 }
+#endif
 
 - (void) addTkDirtyRect: (NSRect) rect
 {
@@ -1199,29 +1237,8 @@ static const char *const accentNames[] = {
     } else if (effectiveAppearanceName == NSAppearanceNameDarkAqua) {
 	TkSendVirtualEvent(tkwin, "DarkAqua", NULL);
     }
-    if ([NSApp macOSVersion] < 101500) {
-
-	/*
-	 * Mojave cannot handle the KVO shenanigans that we need for the
-	 * highlight and accent color notifications.
-	 */
-
-	return;
-    }
     if (!defaultColor) {
 	defaultColor = [NSApp macOSVersion] < 110000 ? "Blue" : "Multicolor";
-	preferences = [[NSUserDefaults standardUserDefaults] retain];
-
-	/*
-	 * AppKit calls this method when the user changes the Accent Color
-	 * but not when the user changes the Highlight Color.  So we register
-	 * to receive KVO notifications for Highlight Color as well.
-	 */
-
-	[preferences addObserver:self
-		      forKeyPath:@"AppleHighlightColor"
-			 options:NSKeyValueObservingOptionNew
-			 context:NULL];
     }
     NSString *accent = [preferences stringForKey:@"AppleAccentColor"];
     NSArray *words = [[preferences stringForKey:@"AppleHighlightColor"]
@@ -1241,6 +1258,8 @@ static const char *const accentNames[] = {
 			change:(NSDictionary *)change
 		       context:(void *)context
 {
+    (void) change;
+    (void) context;
     NSUserDefaults *preferences = [NSUserDefaults standardUserDefaults];
     if (object == preferences && [keyPath isEqualToString:@"AppleHighlightColor"]) {
 	if (@available(macOS 10.14, *)) {
@@ -1259,9 +1278,9 @@ static const char *const accentNames[] = {
 - (void) tkToolbarButton: (id) sender
 {
 #ifdef TK_MAC_DEBUG_EVENTS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), sender);
 #endif
-    XVirtualEvent event;
+    union {XEvent general; XVirtualEvent virt;} event;
     int x, y;
     TkWindow *winPtr = TkMacOSXGetTkWindow([self window]);
     Tk_Window tkwin = (Tk_Window)winPtr;
@@ -1270,21 +1289,21 @@ static const char *const accentNames[] = {
     if (!winPtr){
 	return;
     }
-    bzero(&event, sizeof(XVirtualEvent));
-    event.type = VirtualEvent;
-    event.serial = LastKnownRequestProcessed(Tk_Display(tkwin));
-    event.send_event = false;
-    event.display = Tk_Display(tkwin);
-    event.event = Tk_WindowId(tkwin);
-    event.root = XRootWindow(Tk_Display(tkwin), 0);
-    event.subwindow = None;
-    event.time = TkpGetMS();
+    bzero(&event, sizeof(event));
+    event.virt.type = VirtualEvent;
+    event.virt.serial = LastKnownRequestProcessed(Tk_Display(tkwin));
+    event.virt.send_event = false;
+    event.virt.display = Tk_Display(tkwin);
+    event.virt.event = Tk_WindowId(tkwin);
+    event.virt.root = XRootWindow(Tk_Display(tkwin), 0);
+    event.virt.subwindow = None;
+    event.virt.time = TkpGetMS();
     XQueryPointer(NULL, winPtr->window, NULL, NULL,
-	    &event.x_root, &event.y_root, &x, &y, &event.state);
-    Tk_TopCoordsToWindow(tkwin, x, y, &event.x, &event.y);
-    event.same_screen = true;
-    event.name = Tk_GetUid("ToolbarButton");
-    Tk_QueueWindowEvent((XEvent *) &event, TCL_QUEUE_TAIL);
+	    &event.virt.x_root, &event.virt.y_root, &x, &y, &event.virt.state);
+    Tk_TopCoordsToWindow(tkwin, x, y, &event.virt.x, &event.virt.y);
+    event.virt.same_screen = true;
+    event.virt.name = Tk_GetUid("ToolbarButton");
+    Tk_QueueWindowEvent(&event.general, TCL_QUEUE_TAIL);
 }
 
 /*
@@ -1312,7 +1331,7 @@ static const char *const accentNames[] = {
     (void)theEvent;
 
 #ifdef TK_MAC_DEBUG_EVENTS
-    TKLog(@"-[%@(%p) %s] %@", [self class], self, _cmd, theEvent);
+    TKLog(@"-[%@(%p) %s] %@", [self class], self, sel_getName(_cmd), theEvent);
 #endif
 }
 

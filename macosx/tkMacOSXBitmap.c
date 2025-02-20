@@ -3,9 +3,9 @@
  *
  *	This file handles the implementation of native bitmaps.
  *
- * Copyright (c) 1996-1997 Sun Microsystems, Inc.
- * Copyright 2001-2009, Apple Inc.
- * Copyright (c) 2006-2009 Daniel A. Steffen <das@users.sourceforge.net>
+ * Copyright © 1996-1997 Sun Microsystems, Inc.
+ * Copyright © 2001-2009 Apple Inc.
+ * Copyright © 2006-2009 Daniel A. Steffen <das@users.sourceforge.net>
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -13,6 +13,7 @@
 
 #include "tkMacOSXPrivate.h"
 #include "tkMacOSXConstants.h"
+
 /*
  * This structure holds information about native bitmaps.
  */
@@ -23,7 +24,7 @@ typedef struct {
 } BuiltInIcon;
 
 /*
- * This array mapps a string name to the supported builtin icons
+ * This array maps a string name to the supported builtin icons
  * on the Macintosh.
  */
 
@@ -48,9 +49,6 @@ static BuiltInIcon builtInIcons[] = {
 };
 
 #define builtInIconSize 32
-
-#define OSTYPE_TO_UTI(x) (NSString *)UTTypeCreatePreferredIdentifierForTag( \
-     kUTTagClassOSType, UTCreateStringForOSType(x), nil)
 
 static Tcl_HashTable iconBitmapTable = {};
 typedef struct {
@@ -135,7 +133,7 @@ PixmapFromImage(
     TkMacOSXDrawingContext dc;
     Pixmap pixmap;
 
-    pixmap = Tk_GetPixmap(display, None, size.width, size.height, 0);
+    pixmap = Tk_GetPixmap(display, None, (int)size.width, (int)size.height, 0);
     if (TkMacOSXSetupDrawingContext(pixmap, NULL, &dc)) {
 	if (dc.context) {
 	    CGAffineTransform t = { .a = 1, .b = 0, .c = 0, .d = -1,
@@ -174,9 +172,8 @@ TkpCreateNativeBitmap(
     Display *display,
     const void *source)		/* Info about the icon to build. */
 {
-    NSString *iconUTI = OSTYPE_TO_UTI(PTR2UINT(source));
-    NSImage *iconImage = [[NSWorkspace sharedWorkspace]
-			     iconForFileType: iconUTI];
+    NSString *filetype = TkMacOSXOSTypeToUTI(PTR2UINT(source));
+    NSImage *iconImage = TkMacOSXIconForFileType(filetype);
     CGSize size = CGSizeMake(builtInIconSize, builtInIconSize);
     Pixmap pixmap = PixmapFromImage(display, iconImage, size);
     return pixmap;
@@ -253,7 +250,6 @@ TkpGetNativeAppBitmap(
     NSString *string;
     NSImage *image = nil;
     NSSize size = { .width = builtInIconSize, .height = builtInIconSize };
-
     if (iconBitmapTable.buckets &&
 	    (hPtr = Tcl_FindHashEntry(&iconBitmapTable, name))) {
 	OSType type;
@@ -268,12 +264,12 @@ TkpGetNativeAppBitmap(
 	    break;
 	case ICON_FILETYPE:
 	    string = [NSString stringWithUTF8String:iconBitmap->value];
-	    image = [[NSWorkspace sharedWorkspace] iconForFileType:string];
+	    image = TkMacOSXIconForFileType(string);
 	    break;
 	case ICON_OSTYPE:
 	    if (OSTypeFromString(iconBitmap->value, &type) == TCL_OK) {
-		string = NSFileTypeForHFSTypeCode(type);
-		image = [[NSWorkspace sharedWorkspace] iconForFileType:string];
+		string = [NSString stringWithUTF8String:iconBitmap->value];
+		image = TkMacOSXIconForFileType(string);
 	    }
 	    break;
 	case ICON_SYSTEMTYPE:
@@ -308,18 +304,22 @@ TkpGetNativeAppBitmap(
 	}
     }
     if (image) {
-	*width = size.width;
-	*height = size.height;
 	pixmap = PixmapFromImage(display, image, NSSizeToCGSize(size));
     } else if (name) {
+	/*
+	 * As a last resort, try to interpret the name as an OSType.
+	 * It would probably be better to just return None at this
+	 * point.
+	 */
 	OSType iconType;
 	if (OSTypeFromString(name, &iconType) == TCL_OK) {
-	    NSString *iconUTI = OSTYPE_TO_UTI(iconType);
-	    NSImage *iconImage = [[NSWorkspace sharedWorkspace]
-				     iconForFileType: iconUTI];
+	    NSString *iconUTI = TkMacOSXOSTypeToUTI(iconType);
+	    NSImage *iconImage = TkMacOSXIconForFileType(iconUTI);
 	    pixmap = PixmapFromImage(display, iconImage, NSSizeToCGSize(size));
 	}
     }
+    *width = (int)size.width;
+    *height = (int)size.height;
     return pixmap;
 }
 
@@ -347,7 +347,8 @@ TkMacOSXIconBitmapObjCmd(
     Tcl_Obj *const objv[])	/* Argument objects. */
 {
     Tcl_HashEntry *hPtr;
-    int i = 1, len, isNew, result = TCL_ERROR;
+    int isNew, result = TCL_ERROR;
+    int i = 1, len;
     const char *name, *value;
     IconBitmap ib, *iconBitmap;
 

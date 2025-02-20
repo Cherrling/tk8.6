@@ -156,7 +156,10 @@ void TtkFreeImageSpec(Ttk_ImageSpec *imageSpec)
 /* TtkSelectImage --
  * 	Return a state-specific image from an ImageSpec
  */
-Tk_Image TtkSelectImage(Ttk_ImageSpec *imageSpec, Ttk_State state)
+Tk_Image TtkSelectImage(
+    Ttk_ImageSpec *imageSpec,
+    TCL_UNUSED(Tk_Window),
+    Ttk_State state)
 {
     int i;
     for (i = 0; i < imageSpec->mapCount; ++i) {
@@ -249,7 +252,7 @@ static void Ttk_Tile(
 typedef struct {		/* ClientData for image elements */
     Ttk_ImageSpec *imageSpec;	/* Image(s) to use */
     int minWidth;		/* Minimum width; overrides image width */
-    int minHeight;		/* Minimum width; overrides image width */
+    int minHeight;		/* Minimum height; overrides image height */
     Ttk_Sticky sticky;		/* -stickiness specification */
     Ttk_Padding border;		/* Fixed border region */
     Ttk_Padding padding;	/* Internal padding */
@@ -307,10 +310,10 @@ static void ImageElementDraw(
 	}
     }
     if (!image) {
-	image = TtkSelectImage(imageData->imageSpec, state);
+	image = TtkSelectImage(imageData->imageSpec, tkwin, state);
     }
 #else
-    image = TtkSelectImage(imageData->imageSpec, state);
+    image = TtkSelectImage(imageData->imageSpec, tkwin, state);
 #endif
 
     if (!image) {
@@ -344,7 +347,7 @@ Ttk_CreateImageElement(
     const char *elementName,
     int objc, Tcl_Obj *const objv[])
 {
-    static const char *optionStrings[] =
+    static const char *const optionStrings[] =
 	 { "-border","-height","-padding","-sticky","-width",NULL };
     enum { O_BORDER, O_HEIGHT, O_PADDING, O_STICKY, O_WIDTH };
 
@@ -442,8 +445,8 @@ error:
     return TCL_ERROR;
 }
 
-MODULE_SCOPE
-void TtkImage_Init(Tcl_Interp *interp)
+MODULE_SCOPE void
+TtkImage_Init(Tcl_Interp *interp)
 {
     Ttk_RegisterElementFactory(interp, "image", Ttk_CreateImageElement, NULL);
 }

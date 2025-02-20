@@ -4,7 +4,7 @@
 #
 # Copyright (c) 1994 The Regents of the University of California.
 # Copyright (c) 1994 Sun Microsystems, Inc.
-# Copyright (c) 1998-1999 by Scriptics Corporation.
+# Copyright (c) 1998-1999 Scriptics Corporation.
 # All rights reserved.
 
 package require tcltest 2.2
@@ -50,7 +50,7 @@ test image-1.6 {Tk_ImageCmd procedure, "create" option} -constraints {
     expr {$second-$first}
 } -cleanup {
     imageCleanup
-} -result {1}
+} -result 1
 
 test image-1.7 {Tk_ImageCmd procedure, "create" option} -constraints {
     testImageType

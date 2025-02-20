@@ -4,7 +4,7 @@ puts private Tk headers there).
 
 --- a/unix/tkConfig.sh.in
 +++ b/unix/tkConfig.sh.in
-@@ -53,7 +53,7 @@
+@@ -52,7 +52,7 @@
  
  # String to pass to linker to pick up the Tk library from its
  # build directory.
@@ -13,7 +13,7 @@ puts private Tk headers there).
  
  # String to pass to linker to pick up the Tk library from its
  # installed directory.
-@@ -69,7 +69,7 @@
+@@ -68,7 +68,7 @@
  # different place than the directory containing the source files, this
  # points to the location of the sources, not the location where Tk was
  # compiled.
@@ -22,7 +22,7 @@ puts private Tk headers there).
  
  # Needed if you want to make a 'fat' shared library library
  # containing tk objects or link a different wish.
-@@ -84,14 +84,14 @@
+@@ -83,14 +83,14 @@
  
  # String to pass to linker to pick up the Tk stub library from its
  # build directory.

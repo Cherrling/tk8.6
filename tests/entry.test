@@ -3,7 +3,7 @@
 #
 # Copyright (c) 1994 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
-# Copyright (c) 1998-1999 by Scriptics Corporation.
+# Copyright (c) 1998-1999 Scriptics Corporation.
 # All rights reserved.
 
 package require tcltest 2.2
@@ -11,17 +11,13 @@ namespace import ::tcltest::*
 eval tcltest::configure $argv
 tcltest::loadTestedCommands
 
-testConstraint failsOnUbuntu [expr {![info exists ::env(CI)] || ![string match Linux $::tcl_platform(os)]}]
-testConstraint failsOnUbuntuNoXft [expr {[testConstraint failsOnUbuntu] || (![catch {tk::pkgconfig get fontsystem} fs] && ($fs eq "xft"))}]
-testConstraint failsOnXQuarz [expr {$tcl_platform(os) ne "Darwin" || [tk windowingsystem] ne "x11" }]
-
 # For xscrollcommand
 set scrollInfo {}
 proc scroll args {
         global scrollInfo
         set scrollInfo $args
 }
-# For trace variable
+# For trace add variable
 proc override args {
         global x
         set x 12345
@@ -63,7 +59,7 @@ test entry-1.2 {configuration option: "background" for entry} -setup {
     .e configure -background non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.3 {configuration option: "bd" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -83,7 +79,7 @@ test entry-1.4 {configuration option: "bd" for entry} -setup {
     .e configure -bd badValue
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad screen distance "badValue"}
+} -returnCodes error -result {bad screen distance "badValue"}
 
 test entry-1.5 {configuration option: "bg" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -103,7 +99,7 @@ test entry-1.6 {configuration option: "bg" for entry} -setup {
     .e configure -bg non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.7 {configuration option: "borderwidth" for entry} -setup {
     entry .e -highlightthickness 2 -font {Helvetica -12 bold}
@@ -123,7 +119,7 @@ test entry-1.8 {configuration option: "borderwidth" for entry} -setup {
     .e configure -borderwidth badValue
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad screen distance "badValue"}
+} -returnCodes error -result {bad screen distance "badValue"}
 
 test entry-1.9 {configuration option: "cursor" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -143,7 +139,7 @@ test entry-1.10 {configuration option: "cursor" for entry} -setup {
     .e configure -cursor badValue
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad cursor spec "badValue"}
+} -returnCodes error -result {bad cursor spec "badValue"}
 
 test entry-1.11 {configuration option: "disabledbackground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -163,7 +159,7 @@ test entry-1.12 {configuration option: "disabledbackground" for entry} -setup {
     .e configure -disabledbackground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.13 {configuration option: "disabledforeground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -183,7 +179,7 @@ test entry-1.14 {configuration option: "disabledforeground" for entry} -setup {
     .e configure -disabledforeground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.15 {configuration option: "exportselection" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -203,7 +199,7 @@ test entry-1.16 {configuration option: "exportselection" for entry} -setup {
     .e configure -exportselection xyzzy
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {expected boolean value but got "xyzzy"}
+} -returnCodes error -result {expected boolean value but got "xyzzy"}
 
 test entry-1.17 {configuration option: "fg" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -223,7 +219,7 @@ test entry-1.18 {configuration option: "fg" for entry} -setup {
     .e configure -fg non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.19 {configuration option: "font" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2
@@ -243,7 +239,7 @@ test entry-1.20 {configuration option: "font" for entry} -setup {
     .e configure -font {}
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {font "" doesn't exist}
+} -returnCodes error -result {font "" doesn't exist}
 
 test entry-1.21 {configuration option: "foreground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -263,7 +259,7 @@ test entry-1.22 {configuration option: "foreground" for entry} -setup {
     .e configure -foreground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.23 {configuration option: "highlightbackground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -283,7 +279,7 @@ test entry-1.24 {configuration option: "highlightbackground" for entry} -setup {
     .e configure -highlightbackground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.25 {configuration option: "highlightcolor" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -303,7 +299,7 @@ test entry-1.26 {configuration option: "highlightcolor" for entry} -setup {
     .e configure -highlightcolor non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.27 {configuration option: "highlightthickness" for entry} -setup {
     entry .e -borderwidth 2 -font {Helvetica -12 bold}
@@ -333,7 +329,7 @@ test entry-1.29 {configuration option: "highlightthickness" for entry} -setup {
     .e configure -highlightthickness badValue
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad screen distance "badValue"}
+} -returnCodes error -result {bad screen distance "badValue"}
 
 test entry-1.30 {configuration option: "insertbackground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -353,7 +349,7 @@ test entry-1.31 {configuration option: "insertbackground" for entry} -setup {
     .e configure -insertbackground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.32 {configuration option: "insertborderwidth" for entry} -setup {
     entry .e -borderwidth 2 -insertwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -373,7 +369,7 @@ test entry-1.33 {configuration option: "insertborderwidth" for entry} -setup {
     .e configure -insertborderwidth 2.6x
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad screen distance "2.6x"}
+} -returnCodes error -result {bad screen distance "2.6x"}
 
 test entry-1.34 {configuration option: "insertofftime" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -393,7 +389,7 @@ test entry-1.35 {configuration option: "insertofftime" for entry} -setup {
     .e configure -insertofftime 3.2
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {expected integer but got "3.2"}
+} -returnCodes error -result {expected integer but got "3.2"}
 
 test entry-1.36 {configuration option: "insertontime" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -413,7 +409,7 @@ test entry-1.37 {configuration option: "insertontime" for entry} -setup {
     .e configure -insertontime 3.2
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {expected integer but got "3.2"}
+} -returnCodes error -result {expected integer but got "3.2"}
 
 test entry-1.38 {configuration option: "invalidcommand" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -455,7 +451,7 @@ test entry-1.41 {configuration option: "justify" for entry} -setup {
     .e configure -justify bogus
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad justification "bogus": must be left, right, or center}
+} -returnCodes error -result {bad justification "bogus": must be left, right, or center}
 
 test entry-1.42 {configuration option: "readonlybackground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -475,7 +471,7 @@ test entry-1.43 {configuration option: "readonlybackground" for entry} -setup {
     .e configure -readonlybackground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.44 {configuration option: "relief" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -506,7 +502,7 @@ test entry-1.46 {configuration option: "selectbackground" for entry} -setup {
     .e configure -selectbackground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.47 {configuration option: "selectborderwidth" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -526,7 +522,7 @@ test entry-1.48 {configuration option: "selectborderwidth" for entry} -setup {
     .e configure -selectborderwidth badValue
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad screen distance "badValue"}
+} -returnCodes error -result {bad screen distance "badValue"}
 
 test entry-1.49 {configuration option: "selectforeground" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -546,7 +542,7 @@ test entry-1.50 {configuration option: "selectforeground" for entry} -setup {
     .e configure -selectforeground non-existent
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {unknown color name "non-existent"}
+} -returnCodes error -result {unknown color name "non-existent"}
 
 test entry-1.51 {configuration option: "show" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -577,7 +573,7 @@ test entry-1.53 {configuration option: "state" for entry} -setup {
     .e configure -state bogus
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {bad state "bogus": must be disabled, normal, or readonly}
+} -returnCodes error -result {bad state "bogus": must be disabled, normal, or readonly}
 
 test entry-1.54 {configuration option: "takefocus" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -619,7 +615,7 @@ test entry-1.57 {configuration option: "width" for entry} -setup {
     .e configure -width 3p
 } -cleanup {
     destroy .e
-} -returnCodes {error} -result {expected integer but got "3p"}
+} -returnCodes error -result {expected integer but got "3p"}
 
 test entry-1.58 {configuration option: "xscrollcommand" for entry} -setup {
     entry .e -borderwidth 2 -highlightthickness 2 -font {Helvetica -12 bold}
@@ -1613,13 +1609,13 @@ test entry-5.4 {ConfigureEntry procedure, -textvariable} -setup {
     unset -nocomplain x
     entry .e
 } -body {
-    trace variable x w override
+    trace add variable x write override
     .e insert 0 "Some text"
     .e configure -textvariable x
     list $x [.e get]
 } -cleanup {
     destroy .e
-    trace vdelete x w override
+    trace remove variable x write override
     unset x;
 } -result {12345 12345}
 
@@ -1676,19 +1672,18 @@ test entry-5.7 {ConfigureEntry procedure} -setup {
 } -body {
     .e configure -font {Courier -12} -width 4 -xscrollcommand scroll
     .e insert end "01234567890"
-    update idletasks
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    update
+    set scrollInfo wrong
     .e configure -width 5
-    vwait scrollInfo
+    update
     format {%.6f %.6f} {*}$scrollInfo
 } -cleanup {
     destroy .e
-    after cancel $timeout
-} -result {0.000000 0.363636}
+} -result {0.000000 0.454545}
 
 
 test entry-5.8 {ConfigureEntry procedure} -constraints {
-    fonts failsOnXQuarz
+    fonts
 } -setup {
     entry .e -borderwidth 2 -highlightthickness 2
     pack .e ; update idletasks
@@ -1922,14 +1917,14 @@ test entry-7.1 {InsertChars procedure} -setup {
     focus .e
 } -body {
     .e configure -textvariable contents -xscrollcommand scroll
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    update
+    set scrollInfo wrong
     .e insert 0 abcde
     .e insert 2 XXX
-    vwait scrollInfo
+    update
     list [.e get] $contents [format {%.6f %.6f} {*}$scrollInfo]
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {abXXXcde abXXXcde {0.000000 1.000000}}
 
 test entry-7.2 {InsertChars procedure} -setup {
@@ -1939,14 +1934,14 @@ test entry-7.2 {InsertChars procedure} -setup {
     focus .e
 } -body {
     .e configure -textvariable contents -xscrollcommand scroll
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    update
+    set scrollInfo wrong
     .e insert 0 abcde
     .e insert 500 XXX
-    vwait scrollInfo
+    update
     list [.e get] $contents [format {%.6f %.6f} {*}$scrollInfo]
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {abcdeXXX abcdeXXX {0.000000 1.000000}}
 test entry-7.3 {InsertChars procedure} -setup {
     entry .e -width 10 -font {Courier -12} -highlightthickness 2 -bd 2
@@ -2073,14 +2068,14 @@ test entry-8.1 {DeleteChars procedure} -setup {
     focus .e
 } -body {
     .e configure -textvariable contents -xscrollcommand scroll
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    update
+    set scrollInfo wrong
     .e insert 0 abcde
     .e delete 2 4
-    vwait scrollInfo
+    update
     list [.e get] $contents [format {%.6f %.6f} {*}$scrollInfo]
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {abe abe {0.000000 1.000000}}
 test entry-8.2 {DeleteChars procedure} -setup {
     unset -nocomplain contents
@@ -2089,14 +2084,14 @@ test entry-8.2 {DeleteChars procedure} -setup {
     focus .e
 } -body {
     .e configure -textvariable contents -xscrollcommand scroll
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    update
+    set scrollInfo wrong
     .e insert 0 abcde
     .e delete -1 2
-    vwait scrollInfo
+    update
     list [.e get] $contents [format {%.6f %.6f} {*}$scrollInfo]
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {cde cde {0.000000 1.000000}}
 test entry-8.3 {DeleteChars procedure} -setup {
     unset -nocomplain contents
@@ -2105,14 +2100,14 @@ test entry-8.3 {DeleteChars procedure} -setup {
     focus .e
 } -body {
     .e configure -textvariable contents -xscrollcommand scroll
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    update
+    set scrollInfo wrong
     .e insert 0 abcde
     .e delete 3 1000
-    vwait scrollInfo
+    update
     list [.e get] $contents [format {%.6f %.6f} {*}$scrollInfo]
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {abc abc {0.000000 1.000000}}
 test entry-8.4 {DeleteChars procedure} -setup {
     entry .e -width 10 -font {Courier -12} -highlightthickness 2 -bd 2
@@ -2315,7 +2310,7 @@ test entry-8.17 {DeleteChars procedure} -setup {
 } -cleanup {
     destroy .e
 } -result 4
-test entry-8.18 {DeleteChars procedure} -constraints failsOnUbuntuNoXft -setup {
+test entry-8.18 {DeleteChars procedure} -setup {
     entry .e -width 0 -font {Courier -12} -highlightthickness 2 -bd 2
     pack .e ; update idletasks
     focus .e
@@ -2323,21 +2318,31 @@ test entry-8.18 {DeleteChars procedure} -constraints failsOnUbuntuNoXft -setup {
     .e insert 0 "xyzzy"
     update
     .e delete 2 4
-    winfo reqwidth .e
+    # To check that deletion actually happened we measure the new width
+    # of the widget, based on the measuring width of the remaining text ("xyy")
+    # in the widget. For that purpose we have to mirror the code in tkEntry.c
+    # for computation of the reqwidth
+    # note: XPAD corresponds to the hardcoded    #define XPAD 1
+    set XPAD 1
+    set expected [expr { [font measure [.e cget -font] "xyy"] \
+                          + 2 * ( [.e cget -borderwidth] + \
+                                [.e cget -highlightthickness] + $XPAD ) } ]
+    expr {[winfo reqwidth .e] == $expected}
 } -cleanup {
     destroy .e
-} -result 31
+    unset XPAD expected
+} -result {1}
 
 test entry-9.1 {EntryValueChanged procedure} -setup {
     unset -nocomplain x
 } -body {
-    trace variable x w override
+    trace add variable x write override
     entry .e -textvariable x -width 0
     .e insert 0 foo
     list $x [.e get]
 } -cleanup {
     destroy .e
-    trace vdelete x w override
+    trace remove variable x write override
     unset x
 } -result {12345 12345}
 
@@ -2942,41 +2947,39 @@ test entry-16.4 {EntryVisibleRange procedure} -body {
 
 test entry-17.1 {EntryUpdateScrollbar procedure} -body {
     entry .e -width 10 -xscrollcommand scroll -font {Courier -12}
-    pack .e ; update idletasks
-    update idletasks
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    pack .e
+    update
+    set scrollInfo wrong
     .e delete 0 end
     .e insert 0 123
-    vwait scrollInfo
+    update
     format {%.6f %.6f} {*}$scrollInfo
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {0.000000 1.000000}
 test entry-17.2 {EntryUpdateScrollbar procedure} -body {
     entry .e -width 10 -xscrollcommand scroll -font {Courier -12}
-    pack .e ; update idletasks
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    pack .e
+    update
+    set scrollInfo wrong
     .e insert 0 0123456789abcdef
     .e xview 3
-    vwait scrollInfo
+    update
     format {%.6f %.6f} {*}$scrollInfo
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {0.187500 0.812500}
 test entry-17.3 {EntryUpdateScrollbar procedure} -body {
     entry .e -width 10 -xscrollcommand scroll -font {Courier -12}
-    pack .e ; update idletasks
-    update idletasks
-    set timeout [after 500 {set scrollInfo {-1000000 -1000000}}]
+    pack .e
+    update
+    set scrollInfo wrong
     .e insert 0 abcdefghijklmnopqrs
     .e xview 6
-    vwait scrollInfo
+    update
     format {%.6f %.6f} {*}$scrollInfo
 } -cleanup {
     destroy .e
-    after cancel $timeout
 } -result {0.315789 0.842105}
 test entry-17.4 {EntryUpdateScrollbar procedure} -setup {
     proc bgerror msg {
@@ -2985,10 +2988,11 @@ test entry-17.4 {EntryUpdateScrollbar procedure} -setup {
 }
 } -body {
     entry .e -width 5
-    pack .e ; update idletasks
-    update idletasks
+    pack .e
+    update
+    set scrollInfo wrong
     .e configure -xscrollcommand thisisnotacommand
-    vwait x
+    update
     list $x $errorInfo
 } -cleanup {
     destroy .e
@@ -3480,7 +3484,7 @@ test entry-20.7 {widget deletion with textvariable active} -body {
 # SF bugs 607390 and 617446
     set FOO init
     entry .e -textvariable FOO -validate all \
-	    -vcmd {%W configure -bg white; format 1}
+	    -validatecommand {%W configure -bg white; format 1}
     bind .e <Destroy> { set FOO hello }
     destroy .e
     winfo exists .e
@@ -3511,7 +3515,7 @@ test entry-22.1 {lost namespaced textvar} -body {
     set ::test::foo
 } -cleanup {
     destroy .e
-} -returnCodes error -result {can't read "::test::foo": no such variable}
+} -match glob -returnCodes error -result {can*t read "::test::foo": no such variable}
 test entry-22.2 {lost namespaced textvar} -body {
     namespace eval test { variable foo {a b} }
     entry .e -textvariable ::test::foo
@@ -3522,15 +3526,15 @@ test entry-22.2 {lost namespaced textvar} -body {
     list [.e get] [.e cget -textvar] $result1 $result2 $result3
 } -cleanup {
     destroy .e
-} -result [list "a bmo" ::test::foo \
-	{can't set "::test::foo": parent namespace doesn't exist} \
-	{can't set "::test::foo": parent namespace doesn't exist} \
-	{can't read "::test::foo": no such variable}]
+} -match glob -result [list "a bmo" ::test::foo \
+	{can*t set "::test::foo": parent namespace does*t exist} \
+	{can*t set "::test::foo": parent namespace does*t exist} \
+	{can*t read "::test::foo": no such variable}]
 
 test entry-23.1 {error in trace proc attached to the textvariable} -setup {
     destroy .e
 } -body {
-    trace variable myvar w traceit
+    trace add variable myvar write traceit
     proc traceit args {error "Intentional error here!"}
     entry .e -textvariable myvar
     catch {.e insert end mystring} result1
@@ -3538,8 +3542,8 @@ test entry-23.1 {error in trace proc attached to the textvariable} -setup {
     list $result1 $result2
 } -cleanup {
     destroy .e
-} -result [list {can't set "myvar": Intentional error here!} \
-    {can't set "myvar": Intentional error here!}]
+} -match glob -result [list {ca*t set "myvar": Intentional error here!} \
+    {can*t set "myvar": Intentional error here!}]
 
 test entry-24.1 {textvariable lives in a non-existing namespace} -setup {
     destroy .e
@@ -3548,7 +3552,7 @@ test entry-24.1 {textvariable lives in a non-existing namespace} -setup {
     set result1
 } -cleanup {
   destroy .e
-} -result {can't trace "thisnsdoesntexist::myvar": parent namespace doesn't exist}
+} -match glob -result {can*t trace "thisnsdoesntexist::myvar": parent namespace does*t exist}
 
 test entry-25.1 {Bug [5d991b822e]} {
     # Want this not to segfault, or write to variable with empty name
@@ -3576,6 +3580,25 @@ test entry-25.2 {Bug [5d991b822e]} {
     destroy .b
     unset new
 } {}
+test entry-25.3 {Bug [2a32225cd1] - Navigation in a password made of several words} -setup {
+    destroy .e
+    pack [entry .e -show *]
+    update
+    set res {}
+} -body {
+    .e insert end "A sample password made of several words"
+    .e icursor end
+    event generate .e <<PrevWord>>  ; # shall move insert to index 0
+    .e delete insert end
+    lappend res [.e get]
+    .e insert end "A sample password made of several words"
+    .e icursor 2
+    event generate .e <<NextWord>>  ; # shall move insert to index end
+    .e delete 0 insert
+    lappend res [.e get]
+} -cleanup {
+    destroy .e
+} -result {{} {}}
 
 
 # Gathered comments about lacks

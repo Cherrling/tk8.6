@@ -15,10 +15,6 @@
 #include "default.h"
 #include "tkInt.h"
 
-#ifdef _WIN32
-#include "tkWinInt.h"
-#endif
-
 typedef struct {
     Tk_OptionTable listboxOptionTable;
 				/* Table defining configuration options
@@ -220,10 +216,6 @@ enum state {
     STATE_DISABLED, STATE_NORMAL
 };
 
-static const char *const stateStrings[] = {
-    "disabled", "normal", NULL
-};
-
 enum activeStyle {
     ACTIVE_STYLE_DOTBOX, ACTIVE_STYLE_NONE, ACTIVE_STYLE_UNDERLINE
 };
@@ -297,7 +289,7 @@ static const Tk_OptionSpec optionSpecs[] = {
 	 DEF_LISTBOX_SET_GRID, -1, Tk_Offset(Listbox, setGrid), 0, 0, 0},
     {TK_OPTION_STRING_TABLE, "-state", "state", "State",
 	DEF_LISTBOX_STATE, -1, Tk_Offset(Listbox, state),
-	0, stateStrings, 0},
+	0, &tkStateStrings[1], 0},
     {TK_OPTION_STRING, "-takefocus", "takeFocus", "TakeFocus",
 	 DEF_LISTBOX_TAKE_FOCUS, -1, Tk_Offset(Listbox, takeFocus),
 	 TK_OPTION_NULL_OK, 0, 0},
@@ -321,26 +313,23 @@ static const Tk_OptionSpec optionSpecs[] = {
  */
 
 static const Tk_OptionSpec itemAttrOptionSpecs[] = {
-    {TK_OPTION_BORDER, "-background", "background", "Background",
+    {TK_OPTION_BORDER, "-background", NULL, NULL,
      NULL, -1, Tk_Offset(ItemAttr, border),
-     TK_OPTION_NULL_OK|TK_OPTION_DONT_SET_DEFAULT,
-     DEF_LISTBOX_BG_MONO, 0},
+     TK_OPTION_NULL_OK, NULL, 0},
     {TK_OPTION_SYNONYM, "-bg", NULL, NULL,
      NULL, 0, -1, 0, "-background", 0},
     {TK_OPTION_SYNONYM, "-fg", "foreground", NULL,
      NULL, 0, -1, 0, "-foreground", 0},
-    {TK_OPTION_COLOR, "-foreground", "foreground", "Foreground",
+    {TK_OPTION_COLOR, "-foreground", NULL, NULL,
      NULL, -1, Tk_Offset(ItemAttr, fgColor),
-     TK_OPTION_NULL_OK|TK_OPTION_DONT_SET_DEFAULT, 0, 0},
-    {TK_OPTION_BORDER, "-selectbackground", "selectBackground", "Foreground",
+     TK_OPTION_NULL_OK, NULL, 0},
+    {TK_OPTION_BORDER, "-selectbackground", NULL, NULL,
      NULL, -1, Tk_Offset(ItemAttr, selBorder),
-     TK_OPTION_NULL_OK|TK_OPTION_DONT_SET_DEFAULT,
-     DEF_LISTBOX_SELECT_MONO, 0},
-    {TK_OPTION_COLOR, "-selectforeground", "selectForeground", "Background",
+     TK_OPTION_NULL_OK, NULL, 0},
+    {TK_OPTION_COLOR, "-selectforeground", NULL, NULL,
      NULL, -1, Tk_Offset(ItemAttr, selFgColor),
-     TK_OPTION_NULL_OK|TK_OPTION_DONT_SET_DEFAULT,
-     DEF_LISTBOX_SELECT_FG_MONO, 0},
-    {TK_OPTION_END, NULL, NULL, NULL, NULL, 0, -1, 0, 0, 0}
+     TK_OPTION_NULL_OK, NULL, 0},
+    {TK_OPTION_END, NULL, NULL, NULL, NULL, 0, -1, 0, NULL, 0}
 };
 
 /*
@@ -396,7 +385,7 @@ static int		ConfigureListboxItem(Tcl_Interp *interp,
 			    Tcl_Obj *const objv[], int index);
 static int		ListboxDeleteSubCmd(Listbox *listPtr,
 			    int first, int last);
-static void		DestroyListbox(void *memPtr);
+static Tcl_FreeProc	DestroyListbox;
 static void		DestroyListboxOptionTables(ClientData clientData,
 			    Tcl_Interp *interp);
 static void		DisplayListbox(ClientData clientData);
@@ -1284,8 +1273,6 @@ ListboxXviewSubCmd(
 	ChangeListboxOffset(listPtr, index*listPtr->xScrollUnit);
     } else {
 	switch (Tk_GetScrollInfoObj(interp, objc, objv, &fraction, &count)) {
-	case TK_SCROLL_ERROR:
-	    return TCL_ERROR;
 	case TK_SCROLL_MOVETO:
 	    offset = (int) (fraction*listPtr->maxWidth + 0.5);
 	    break;
@@ -1301,6 +1288,8 @@ ListboxXviewSubCmd(
 	case TK_SCROLL_UNITS:
 	    offset = listPtr->xOffset + count*listPtr->xScrollUnit;
 	    break;
+	default:
+	    return TCL_ERROR;
 	}
 	ChangeListboxOffset(listPtr, offset);
     }
@@ -1371,7 +1360,6 @@ ListboxYviewSubCmd(
 	case TK_SCROLL_UNITS:
 	    index = listPtr->topIndex + count;
 	    break;
-	case TK_SCROLL_ERROR:
 	default:
 	    return TCL_ERROR;
 	}
@@ -1444,9 +1432,9 @@ ListboxGetItemAttributes(
 
 static void
 DestroyListbox(
-    void *memPtr)		/* Info about listbox widget. */
+    char *memPtr)		/* Info about listbox widget. */
 {
-    Listbox *listPtr = memPtr;
+    Listbox *listPtr = (Listbox *)memPtr;
     Tcl_HashEntry *entry;
     Tcl_HashSearch search;
 
@@ -1839,6 +1827,7 @@ DisplayListbox(
 {
     Listbox *listPtr = clientData;
     Tk_Window tkwin = listPtr->tkwin;
+    Display *disp = listPtr->display;
     GC gc;
     int i, limit, x, y, prevSelected, freeGC, stringLen;
     Tk_FontMetrics fm;
@@ -1893,7 +1882,7 @@ DisplayListbox(
      * screen).
      */
 
-    pixmap = Tk_GetPixmap(listPtr->display, Tk_WindowId(tkwin),
+    pixmap = Tk_GetPixmap(disp, Tk_WindowId(tkwin),
 	    Tk_Width(tkwin), Tk_Height(tkwin), Tk_Depth(tkwin));
 #else
     pixmap = Tk_WindowId(tkwin);
@@ -1923,7 +1912,7 @@ DisplayListbox(
 	int width = Tk_Width(tkwin);	/* zeroth approx to silence warning */
 
 	x = listPtr->inset;
-	y = ((i - listPtr->topIndex) * listPtr->lineHeight) + listPtr->inset;
+	y = (i - listPtr->topIndex) * listPtr->lineHeight + listPtr->inset;
 	gc = listPtr->textGC;
 	freeGC = 0;
 
@@ -2090,7 +2079,7 @@ DisplayListbox(
                     - listPtr->xOffset + GetMaxOffset(listPtr)/2;
         }
 
-        Tk_DrawChars(listPtr->display, pixmap, gc, listPtr->tkfont,
+        Tk_DrawChars(disp, pixmap, gc, listPtr->tkfont,
 		stringRep, stringLen, x, y);
 
 	/*
@@ -2103,71 +2092,34 @@ DisplayListbox(
 		 * Underline the text.
 		 */
 
-		Tk_UnderlineChars(listPtr->display, pixmap, gc,
-			listPtr->tkfont, stringRep, x, y, 0, stringLen);
+		Tk_UnderlineChars(disp, pixmap, gc, listPtr->tkfont,
+			stringRep, x, y, 0, stringLen);
 	    } else if (listPtr->activeStyle == ACTIVE_STYLE_DOTBOX) {
-#ifdef _WIN32
-		/*
-		 * This provides for exact default look and feel on Windows.
-		 */
-
-		TkWinDCState state;
-		HDC dc;
-		RECT rect;
-
-		dc = TkWinGetDrawableDC(listPtr->display, pixmap, &state);
-		rect.left = listPtr->inset;
-		rect.top = ((i - listPtr->topIndex) * listPtr->lineHeight)
-			+ listPtr->inset;
-		rect.right = rect.left + width;
-		rect.bottom = rect.top + listPtr->lineHeight;
-		DrawFocusRect(dc, &rect);
-		TkWinReleaseDrawableDC(pixmap, dc, &state);
-#else /* !_WIN32 */
 		/*
 		 * Draw a dotted box around the text.
 		 */
 
 		x = listPtr->inset;
-		y = ((i - listPtr->topIndex) * listPtr->lineHeight)
+		y = (i - listPtr->topIndex) * listPtr->lineHeight
 			+ listPtr->inset;
-		width = Tk_Width(tkwin) - 2*listPtr->inset - 1;
+		width = Tk_Width(tkwin) - 2*listPtr->inset;
 
-		gcValues.line_style = LineOnOffDash;
-		gcValues.line_width = listPtr->selBorderWidth;
-		if (gcValues.line_width <= 0) {
-		    gcValues.line_width  = 1;
-		}
-		gcValues.dash_offset = 0;
-		gcValues.dashes = 1;
+		TkDrawDottedRect(disp, pixmap, gc, x, y,
+			width, listPtr->lineHeight);
 
-		/*
-		 * You would think the XSetDashes was necessary, but it
-		 * appears that the default dotting for just saying we want
-		 * dashes appears to work correctly.
-		 static char dashList[] = { 1 };
-		 static int dashLen = sizeof(dashList);
-		 XSetDashes(listPtr->display, gc, 0, dashList, dashLen);
-		 */
-
-		mask = GCLineWidth | GCLineStyle | GCDashList | GCDashOffset;
-		XChangeGC(listPtr->display, gc, mask, &gcValues);
-		XDrawRectangle(listPtr->display, pixmap, gc, x, y,
-			(unsigned) width, (unsigned) listPtr->lineHeight - 1);
 		if (!freeGC) {
 		    /*
 		     * Don't bother changing if it is about to be freed.
 		     */
 
 		    gcValues.line_style = LineSolid;
-		    XChangeGC(listPtr->display, gc, GCLineStyle, &gcValues);
+		    XChangeGC(disp, gc, GCLineStyle, &gcValues);
 		}
-#endif /* _WIN32 */
 	    }
 	}
 
 	if (freeGC) {
-	    Tk_FreeGC(listPtr->display, gc);
+	    Tk_FreeGC(disp, gc);
 	}
     }
 
@@ -2195,10 +2147,9 @@ DisplayListbox(
 	}
     }
 #ifndef TK_NO_DOUBLE_BUFFERING
-    XCopyArea(listPtr->display, pixmap, Tk_WindowId(tkwin),
-	    listPtr->textGC, 0, 0, (unsigned) Tk_Width(tkwin),
-	    (unsigned) Tk_Height(tkwin), 0, 0);
-    Tk_FreePixmap(listPtr->display, pixmap);
+    XCopyArea(disp, pixmap, Tk_WindowId(tkwin), listPtr->textGC, 0, 0,
+	    (unsigned) Tk_Width(tkwin), (unsigned) Tk_Height(tkwin), 0, 0);
+    Tk_FreePixmap(disp, pixmap);
 #endif /* TK_NO_DOUBLE_BUFFERING */
 }
 
@@ -2627,7 +2578,7 @@ ListboxEventProc(
 	    if (listPtr->flags & REDRAW_PENDING) {
 		Tcl_CancelIdleCall(DisplayListbox, clientData);
 	    }
-	    Tcl_EventuallyFree(clientData, (Tcl_FreeProc *) DestroyListbox);
+	    Tcl_EventuallyFree(clientData, DestroyListbox);
 	}
     } else if (eventPtr->type == ConfigureNotify) {
 	int vertSpace;
