@@ -14,6 +14,10 @@
 
 #include "tkInt.h"
 
+#ifdef _WIN32
+#include "tkWinInt.h"
+#endif
+
 /*
  * The includes below are for pre-defined bitmaps.
  *
@@ -834,7 +838,7 @@ Tk_GetBitmapFromData(
 	name = (char *)Tcl_GetHashValue(dataHashPtr);
     } else {
 	dispPtr->bitmapAutoNumber++;
-	sprintf(string, "_tk%d", dispPtr->bitmapAutoNumber);
+	snprintf(string, sizeof(string), "_tk%d", dispPtr->bitmapAutoNumber);
 	name = string;
 	Tcl_SetHashValue(dataHashPtr, name);
 	if (Tk_DefineBitmap(interp, name, source, width, height) != TCL_OK) {
@@ -1014,7 +1018,7 @@ BitmapInit(
 	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
     /*
-     * First initialize the data in the ThreadSpecificData strucuture, if
+     * First initialize the data in the ThreadSpecificData structure, if
      * needed.
      */
 
@@ -1078,7 +1082,7 @@ BitmapInit(
  * TkReadBitmapFile --
  *
  *	Loads a bitmap image in X bitmap format into the specified drawable.
- *	This is equivelent to the XReadBitmapFile in X.
+ *	This is equivalent to the XReadBitmapFile in X.
  *
  * Results:
  *	Sets the size, hotspot, and bitmap on success.
@@ -1169,7 +1173,7 @@ TkDebugBitmap(
  *
  * TkGetBitmapPredefTable --
  *
- *	This function is used by tkMacBitmap.c to access the thread-specific
+ *	This function is used by tkMacOSXBitmap.c to access the thread-specific
  *	predefBitmap table that maps from the names of the predefined bitmaps
  *	to data associated with those bitmaps. It is required because the
  *	table is allocated in thread-local storage and is not visible outside

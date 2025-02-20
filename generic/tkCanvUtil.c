@@ -13,6 +13,10 @@
 #include "tkInt.h"
 #include "tkCanvas.h"
 
+#ifdef _WIN32
+#include "tkWinInt.h"
+#endif
+
 /*
  * Structures defined only in this file.
  */
@@ -424,8 +428,8 @@ Tk_CanvasTagsParseProc(
      */
 
     if (itemPtr->tagSpace < argc) {
-	newPtr = ckalloc(argc * sizeof(Tk_Uid));
-	for (i = itemPtr->numTags-1; i >= 0; i--) {
+	newPtr = (Tk_Uid *)ckalloc(argc * sizeof(Tk_Uid));
+	for (i = itemPtr->numTags - 1; i >= 0; i--) {
 	    newPtr[i] = itemPtr->tagPtr[i];
 	}
 	if (itemPtr->tagPtr != itemPtr->staticTagSpace) {
@@ -570,9 +574,9 @@ TkCanvasDashPrintProc(
     *freeProcPtr = TCL_DYNAMIC;
 
     p = (i > (int)sizeof(char *)) ? dash->pattern.pt : dash->pattern.array;
-    sprintf(buffer, "%d", *p++ & 0xff);
+    snprintf(buffer, 4 * i, "%d", *p++ & 0xff);
     while (--i) {
-	sprintf(buffer+strlen(buffer), " %d", *p++ & 0xff);
+	snprintf(buffer + strlen(buffer), 4 * i - strlen(buffer), " %d", *p++ & 0xff);
     }
     return buffer;
 }

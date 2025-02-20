@@ -122,8 +122,8 @@ override_dh_shlibdeps:
 	dh_shlibdeps -ldebian/libtk$(v)/usr/lib/$(DEB_HOST_MULTIARCH)
 
 get-orig-source:
-	wget -O tk$(v)_$(v).12.orig.tar.gz \
-	     http://prdownloads.sourceforge.net/tcl/tk$(v).12-src.tar.gz
+	wget -O tk$(v)_$(v).16.orig.tar.gz \
+	     http://prdownloads.sourceforge.net/tcl/tk$(v).16-src.tar.gz
 
 .PHONY: override_dh_auto_clean override_dh_auto_configure override_dh_auto_build \
 	override_dh_auto_install override_dh_compress \

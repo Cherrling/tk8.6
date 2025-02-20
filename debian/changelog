@@ -1,3 +1,40 @@
+tk8.6 (8.6.16-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Thu, 09 Jan 2025 13:17:28 +0300
+
+tk8.6 (8.6.15-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Bump standards version to 4.7.0.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Mon, 23 Sep 2024 12:36:15 +0300
+
+tk8.6 (8.6.14-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches.
+  * Drop a few symbols from debian/libtk8.6.symbols.
+  * Bump standards version to 4.6.2.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Sat, 02 Mar 2024 15:51:31 +0300
+
+tk8.6 (8.6.13-2) unstable; urgency=medium
+
+  * Drop the useless menu item and dependency on x-terminal-emulator
+    (closes: #1030148).
+  * Bump debhelper compatibility level to 13.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Wed, 01 Feb 2023 13:36:32 +0300
+
+tk8.6 (8.6.13-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Bump standards version to 4.6.1.
+
+ -- Sergei Golovan <sgolovan@debian.org>  Fri, 25 Nov 2022 14:21:42 +0300
+
 tk8.6 (8.6.12-1) unstable; urgency=medium
 
   * New upstream release.

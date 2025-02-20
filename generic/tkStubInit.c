@@ -3,7 +3,7 @@
  *
  *	This file contains the initializers for the Tk stub vectors.
  *
- * Copyright (c) 1998-1999 by Scriptics Corporation.
+ * Copyright (c) 1998-1999 Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -46,6 +46,7 @@ MODULE_SCOPE const TkStubs tkStubs;
 #undef XGrabServer
 #undef XFree
 #undef XFlush
+#undef Tk_FreeStyleFromObj
 #define TkUnusedStubEntry 0
 
 #define TkpCmapStressed_ TkpCmapStressed
@@ -150,7 +151,7 @@ TkpPrintWindowId(
 				 * the hex representation of a pointer. */
     Window window)		/* Window to be printed into buffer. */
 {
-    sprintf(buf, "0x%" TCL_Z_MODIFIER "x", (size_t)window);
+    snprintf(buf, TCL_INTEGER_SPACE, "0x%" TCL_Z_MODIFIER "x", (size_t)window);
 }
 
 int
@@ -418,7 +419,9 @@ static const TkIntStubs tkIntStubs = {
     0, /* 121 */
 #endif /* WIN */
 #ifdef MAC_OSX_TK /* AQUA */
+# if TCL_MAJOR_VERSION < 9
     0, /* 121 */ /* Dummy entry for stubs table backwards compatibility */
+# endif /* TCL_MAJOR_VERSION < 9 */
     TkpCreateNativeBitmap, /* 121 */
 #endif /* AQUA */
 #if !(defined(_WIN32) || defined(MAC_OSX_TK)) /* X11 */
@@ -428,7 +431,9 @@ static const TkIntStubs tkIntStubs = {
     0, /* 122 */
 #endif /* WIN */
 #ifdef MAC_OSX_TK /* AQUA */
+# if TCL_MAJOR_VERSION < 9
     0, /* 122 */ /* Dummy entry for stubs table backwards compatibility */
+# endif /* TCL_MAJOR_VERSION < 9 */
     TkpDefineNativeBitmaps, /* 122 */
 #endif /* AQUA */
     0, /* 123 */
@@ -439,7 +444,9 @@ static const TkIntStubs tkIntStubs = {
     0, /* 124 */
 #endif /* WIN */
 #ifdef MAC_OSX_TK /* AQUA */
+# if TCL_MAJOR_VERSION < 9
     0, /* 124 */ /* Dummy entry for stubs table backwards compatibility */
+# endif /* TCL_MAJOR_VERSION < 9 */
     TkpGetNativeAppBitmap, /* 124 */
 #endif /* AQUA */
     0, /* 125 */
@@ -520,6 +527,7 @@ static const TkIntStubs tkIntStubs = {
 #ifdef MAC_OSX_TCL /* MACOSX */
     TkpWillDrawWidget, /* 186 */
 #endif /* MACOSX */
+    TkUnusedStubEntry, /* 187 */
 };
 
 static const TkIntPlatStubs tkIntPlatStubs = {
@@ -768,7 +776,7 @@ static const TkIntXlibStubs tkIntXlibStubs = {
     XFilterEvent, /* 78 */
     XmbLookupString, /* 79 */
     TkPutImage, /* 80 */
-    0, /* 81 */
+    XSetClipRectangles, /* 81 */
     XParseColor, /* 82 */
     XCreateGC, /* 83 */
     XFreeGC, /* 84 */
@@ -1332,7 +1340,17 @@ const TkStubs tkStubs = {
     0, /* 277 */
     0, /* 278 */
     0, /* 279 */
-    TkUnusedStubEntry, /* 280 */
+    0, /* 280 */
+    0, /* 281 */
+    0, /* 282 */
+    0, /* 283 */
+    0, /* 284 */
+    0, /* 285 */
+    0, /* 286 */
+    0, /* 287 */
+    0, /* 288 */
+    0, /* 289 */
+    TkUnusedStubEntry, /* 290 */
 };
 
 /* !END!: Do not edit above this line. */

@@ -1,6 +1,6 @@
 libtk8.6.so libtk8.6 #MINVER#
- IsButtonEventType@Base 8.6.11
- IsKeyEventType@Base 8.6.11
+#MISSING: 8.6.14# IsButtonEventType@Base 8.6.11
+#MISSING: 8.6.14# IsKeyEventType@Base 8.6.11
  TkAllocWindow@Base 8.6.0
  TkBTreeNumLines@Base 8.6.0
  TkBezierPoints@Base 8.6.0

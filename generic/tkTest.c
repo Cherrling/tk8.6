@@ -8,7 +8,7 @@
  *
  * Copyright (c) 1993-1994 The Regents of the University of California.
  * Copyright (c) 1994-1997 Sun Microsystems, Inc.
- * Copyright (c) 1998-1999 by Scriptics Corporation.
+ * Copyright (c) 1998-1999 Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -80,7 +80,7 @@ typedef struct TImageInstance {
  */
 
 static int		ImageCreate(Tcl_Interp *interp,
-			    const char *name, int argc, Tcl_Obj *const objv[],
+			    const char *name, int objc, Tcl_Obj *const objv[],
 			    const Tk_ImageType *typePtr, Tk_ImageModel model,
 			    ClientData *clientDataPtr);
 static ClientData	ImageGet(Tk_Window tkwin, ClientData clientData);
@@ -567,6 +567,7 @@ TestobjconfigObjCmd(
 	    Tcl_Obj *doublePtr;
 	    Tcl_Obj *stringPtr;
 	    Tcl_Obj *stringTablePtr;
+	    Tcl_Obj *stringTablePtr2;
 	    Tcl_Obj *colorPtr;
 	    Tcl_Obj *fontPtr;
 	    Tcl_Obj *bitmapPtr;
@@ -584,6 +585,9 @@ TestobjconfigObjCmd(
 	static const char *const stringTable[] = {
 	    "one", "two", "three", "four", NULL
 	};
+	static const char *const stringTable2[] = {
+	    "one", "two", NULL
+	};
 	static const Tk_OptionSpec typesSpecs[] = {
 	    {TK_OPTION_BOOLEAN, "-boolean", "boolean", "Boolean", "1",
 		Tk_Offset(TypesRecord, booleanPtr), -1, 0, 0, 0x1},
@@ -597,7 +601,11 @@ TestobjconfigObjCmd(
 	    {TK_OPTION_STRING_TABLE,
 		"-stringtable", "StringTable", "stringTable",
 		"one", Tk_Offset(TypesRecord, stringTablePtr), -1,
-		TK_CONFIG_NULL_OK, stringTable, 0x10},
+		0, stringTable, 0x10},
+	    {TK_OPTION_STRING_TABLE,
+		"-stringtable2", "StringTable2", "stringTable2",
+		"two", Tk_Offset(TypesRecord, stringTablePtr2), -1,
+		0, stringTable2, 0x10},
 	    {TK_OPTION_COLOR, "-color", "color", "Color",
 		"red", Tk_Offset(TypesRecord, colorPtr), -1,
 		TK_CONFIG_NULL_OK, "black", 0x20},
@@ -610,7 +618,7 @@ TestobjconfigObjCmd(
 	    {TK_OPTION_BORDER, "-border", "border", "Border",
 		"blue", Tk_Offset(TypesRecord, borderPtr), -1,
 		TK_CONFIG_NULL_OK, "white", 0x100},
-	    {TK_OPTION_RELIEF, "-relief", "relief", "Relief", "raised",
+	    {TK_OPTION_RELIEF, "-relief", "relief", "Relief", NULL,
 		Tk_Offset(TypesRecord, reliefPtr), -1,
 		TK_CONFIG_NULL_OK, 0, 0x200},
 	    {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor", "xterm",
@@ -618,10 +626,10 @@ TestobjconfigObjCmd(
 		TK_CONFIG_NULL_OK, 0, 0x400},
 	    {TK_OPTION_JUSTIFY, "-justify", NULL, NULL, "left",
 		Tk_Offset(TypesRecord, justifyPtr), -1,
-		TK_CONFIG_NULL_OK, 0, 0x800},
-	    {TK_OPTION_ANCHOR, "-anchor", "anchor", "Anchor", NULL,
+		0, 0, 0x800},
+	    {TK_OPTION_ANCHOR, "-anchor", "anchor", "Anchor", "center",
 		Tk_Offset(TypesRecord, anchorPtr), -1,
-		TK_CONFIG_NULL_OK, 0, 0x1000},
+		0, 0, 0x1000},
 	    {TK_OPTION_PIXELS, "-pixel", "pixel", "Pixel",
 		"1", Tk_Offset(TypesRecord, pixelPtr), -1,
 		TK_CONFIG_NULL_OK, 0, 0x2000},
@@ -662,6 +670,7 @@ TestobjconfigObjCmd(
 	recordPtr->pixelPtr = NULL;
 	recordPtr->mmPtr = NULL;
 	recordPtr->stringTablePtr = NULL;
+	recordPtr->stringTablePtr2 = NULL;
 	recordPtr->customPtr = NULL;
 	result = Tk_InitOptions(interp, (char *) recordPtr, optionTable,
 		tkwin);
@@ -882,7 +891,7 @@ TestobjconfigObjCmd(
 	    {TK_OPTION_BORDER, "-border", "border", "Border", "blue",
 		-1, Tk_Offset(InternalRecord, border),
 		TK_CONFIG_NULL_OK, "white", 0x100},
-	    {TK_OPTION_RELIEF, "-relief", "relief", "Relief", "raised",
+	    {TK_OPTION_RELIEF, "-relief", "relief", "Relief", NULL,
 		-1, Tk_Offset(InternalRecord, relief),
 		TK_CONFIG_NULL_OK, 0, 0x200},
 	    {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor", "xterm",
@@ -890,10 +899,10 @@ TestobjconfigObjCmd(
 		TK_CONFIG_NULL_OK, 0, 0x400},
 	    {TK_OPTION_JUSTIFY, "-justify", NULL, NULL, "left",
 		-1, Tk_Offset(InternalRecord, justify),
-		TK_CONFIG_NULL_OK, 0, 0x800},
-	    {TK_OPTION_ANCHOR, "-anchor", "anchor", "Anchor", NULL,
+		0, 0, 0x800},
+	    {TK_OPTION_ANCHOR, "-anchor", "anchor", "Anchor", "center",
 		-1, Tk_Offset(InternalRecord, anchor),
-		TK_CONFIG_NULL_OK, 0, 0x1000},
+		0, 0, 0x1000},
 	    {TK_OPTION_PIXELS, "-pixel", "pixel", "Pixel", "1",
 		-1, Tk_Offset(InternalRecord, pixels),
 		TK_CONFIG_NULL_OK, 0, 0x2000},
@@ -934,7 +943,7 @@ TestobjconfigObjCmd(
 	recordPtr->relief = TK_RELIEF_FLAT;
 	recordPtr->cursor = NULL;
 	recordPtr->justify = TK_JUSTIFY_LEFT;
-	recordPtr->anchor = TK_ANCHOR_N;
+	recordPtr->anchor = TK_ANCHOR_CENTER;
 	recordPtr->pixels = 0;
 	recordPtr->mm = 0.0;
 	recordPtr->tkwin = NULL;
@@ -1496,7 +1505,7 @@ ImageGet(
     char buffer[100];
     XGCValues gcValues;
 
-    sprintf(buffer, "%s get", timPtr->imageName);
+    snprintf(buffer, sizeof(buffer), "%s get", timPtr->imageName);
     Tcl_SetVar2(timPtr->interp, timPtr->varName, NULL, buffer,
 	    TCL_GLOBAL_ONLY|TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
 
@@ -1565,7 +1574,7 @@ ImageDisplay(
 	     * Log the message.
 	     */
 
-	    sprintf(instPtr->buffer, "%s display %d %d %d %d",
+	    snprintf(instPtr->buffer, sizeof(instPtr->buffer), "%s display %d %d %d %d",
 	    instPtr->modelPtr->imageName, imageX, imageY, width, height);
 	}
 	Tcl_SetVar2(instPtr->modelPtr->interp, instPtr->modelPtr->varName,
@@ -1575,12 +1584,12 @@ ImageDisplay(
     } else {
 
 	/*
-         * Drawing is not possible on the first call to DisplayImage.
+	 * Drawing is not possible on the first call to DisplayImage.
 	 * Save the message, but do not log it until the actual display.
 	 */
 
 	if (instPtr->displayFailed == False) {
-	    sprintf(instPtr->buffer, "%s display %d %d %d %d",
+	    snprintf(instPtr->buffer, sizeof(instPtr->buffer), "%s display %d %d %d %d",
 		    instPtr->modelPtr->imageName, imageX, imageY, width, height);
 	}
 	instPtr->displayFailed = True;
@@ -1626,7 +1635,7 @@ ImageFree(
     TImageInstance *instPtr = (TImageInstance *)clientData;
     char buffer[200];
 
-    sprintf(buffer, "%s free", instPtr->modelPtr->imageName);
+    snprintf(buffer, sizeof(buffer), "%s free", instPtr->modelPtr->imageName);
     Tcl_SetVar2(instPtr->modelPtr->interp, instPtr->modelPtr->varName, NULL,
 	    buffer, TCL_GLOBAL_ONLY|TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
     Tk_FreeColor(instPtr->fg);
@@ -1660,7 +1669,7 @@ ImageDelete(
     TImageModel *timPtr = (TImageModel *)clientData;
     char buffer[100];
 
-    sprintf(buffer, "%s delete", timPtr->imageName);
+    snprintf(buffer, sizeof(buffer), "%s delete", timPtr->imageName);
     Tcl_SetVar2(timPtr->interp, timPtr->varName, NULL, buffer,
 	    TCL_GLOBAL_ONLY|TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
 
@@ -1819,7 +1828,7 @@ TestmetricsObjCmd(
 		"\": must be cxhscroll or cyvscroll", NULL);
 	return TCL_ERROR;
     }
-    sprintf(buf, "%d", val);
+    snprintf(buf, sizeof(buf), "%d", val);
     Tcl_AppendResult(interp, buf, NULL);
     return TCL_OK;
 }
@@ -1890,7 +1899,7 @@ TestpropObjCmd(
 		    value = 0xff & *p;
 		    p += 1;
 		}
-		sprintf(buffer, "0x%lx", value);
+		snprintf(buffer, sizeof(buffer), "0x%lx", value);
 		Tcl_AppendElement(interp, buffer);
 	    }
 	}

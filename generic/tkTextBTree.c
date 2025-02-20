@@ -614,7 +614,7 @@ static void
 AdjustStartEndRefs(
     BTree *treePtr,		/* The entire B-tree. */
     TkText *textPtr,		/* The text widget for which we want to adjust
-				 * it's start and end cache. */
+				 * its start and end cache. */
     int action)			/* Action to perform. */
 {
     if (action & TEXT_REMOVE_REFS) {
@@ -632,10 +632,18 @@ AdjustStartEndRefs(
 	    i++;
 	}
 	treePtr->startEndCount = count;
-	treePtr->startEnd = (TkTextLine **)ckrealloc(treePtr->startEnd,
-		sizeof(TkTextLine *) * count);
-	treePtr->startEndRef = (TkText **)ckrealloc(treePtr->startEndRef,
-		sizeof(TkText *) * count);
+	if (count > 0) {
+	    treePtr->startEnd = (TkTextLine**)ckrealloc(treePtr->startEnd,
+		    sizeof(TkTextLine*) * count);
+	    treePtr->startEndRef = (TkText**)ckrealloc(treePtr->startEndRef,
+		    sizeof(TkText*) * count);
+	}
+	else {
+	    ckfree(treePtr->startEndRef);
+	    treePtr->startEndRef = NULL;
+	    ckfree(treePtr->startEnd);
+	    treePtr->startEnd = NULL;
+	}
     }
     if ((action & TEXT_ADD_REFS)
 	    && (textPtr->start != NULL || textPtr->end != NULL)) {
@@ -1898,7 +1906,7 @@ TkBTreePreviousLine(
  *	height of the given line).
  *
  *	Since the last line of text (the artificial one) has zero height by
- *	defintion, calling this with the last line will return the total
+ *	definition, calling this with the last line will return the total
  *	number of pixels in the widget.
  *
  * Results:

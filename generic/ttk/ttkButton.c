@@ -81,7 +81,7 @@ static Tk_OptionSpec BaseOptionSpecs[] =
      */
     {TK_OPTION_STRING_TABLE, "-compound", "compound", "Compound",
 	NULL, Tk_Offset(Base,base.compoundObj), -1,
-	TK_OPTION_NULL_OK, (void *)ttkCompoundStrings,
+	TK_OPTION_NULL_OK, ttkCompoundStrings,
 	GEOMETRY_CHANGED },
     {TK_OPTION_STRING, "-padding", "padding", "Pad",
 	NULL, Tk_Offset(Base,base.paddingObj), -1,
@@ -91,8 +91,8 @@ static Tk_OptionSpec BaseOptionSpecs[] =
      * Compatibility/legacy options
      */
     {TK_OPTION_STRING, "-state", "state", "State",
-	 "normal", Tk_Offset(Base,base.stateObj), -1,
-	 0,0,STATE_CHANGED },
+	"normal", Tk_Offset(Base,base.stateObj), -1,
+	0,0,STATE_CHANGED },
 
     WIDGET_INHERIT_OPTIONS(ttkCoreOptionSpecs)
 };
@@ -119,10 +119,11 @@ static void TextVariableChanged(void *clientData, const char *value)
 }
 
 static void
-BaseInitialize(Tcl_Interp *dummy, void *recordPtr)
+BaseInitialize(
+    TCL_UNUSED(Tcl_Interp *),
+    void *recordPtr)
 {
     Base *basePtr = (Base *)recordPtr;
-    (void)dummy;
 
     basePtr->base.textVariableTrace = 0;
     basePtr->base.imageSpec = NULL;
@@ -140,16 +141,15 @@ BaseCleanup(void *recordPtr)
 
 static void
 BaseImageChanged(
-	ClientData clientData, int x, int y, int width, int height,
-	int imageWidth, int imageHeight)
+    void *clientData,
+    TCL_UNUSED(int),
+    TCL_UNUSED(int),
+    TCL_UNUSED(int),
+    TCL_UNUSED(int),
+    TCL_UNUSED(int),
+    TCL_UNUSED(int))
 {
     Base *basePtr = (Base *)clientData;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    (void)imageWidth;
-    (void)imageHeight;
 
     TtkResizeWidget(&basePtr->core);
 }
@@ -199,12 +199,13 @@ error:
 }
 
 static int
-BasePostConfigure(Tcl_Interp *dummy, void *recordPtr, int mask)
+BasePostConfigure(
+    TCL_UNUSED(Tcl_Interp *),
+    void *recordPtr,
+    TCL_UNUSED(int))
 {
     Base *basePtr = (Base *)recordPtr;
     int status = TCL_OK;
-    (void)dummy;
-    (void)mask;
 
     if (basePtr->base.textVariableTrace) {
 	status = Ttk_FireTrace(basePtr->base.textVariableTrace);
@@ -255,11 +256,11 @@ static Tk_OptionSpec LabelOptionSpecs[] =
 	NULL, Tk_Offset(Label,label.reliefObj), -1,
 	TK_OPTION_NULL_OK,0,GEOMETRY_CHANGED },
     {TK_OPTION_ANCHOR, "-anchor", "anchor", "Anchor",
-	NULL, Tk_Offset(Label,label.anchorObj), -1,
-	TK_OPTION_NULL_OK, 0, GEOMETRY_CHANGED},
+	"w", Tk_Offset(Label,label.anchorObj), -1,
+	0, 0, GEOMETRY_CHANGED},
     {TK_OPTION_JUSTIFY, "-justify", "justify", "Justify",
-	NULL, Tk_Offset(Label, label.justifyObj), -1,
-	TK_OPTION_NULL_OK,0,GEOMETRY_CHANGED },
+	"left", Tk_Offset(Label, label.justifyObj), -1,
+	0,0,GEOMETRY_CHANGED },
     {TK_OPTION_PIXELS, "-wraplength", "wrapLength", "WrapLength",
 	NULL, Tk_Offset(Label, label.wrapLengthObj), -1,
 	TK_OPTION_NULL_OK,0,GEOMETRY_CHANGED /*SB: SIZE_CHANGED*/ },
@@ -326,7 +327,7 @@ static Tk_OptionSpec ButtonOptionSpecs[] =
 	"", Tk_Offset(Button, button.commandObj), -1, 0,0,0},
     {TK_OPTION_STRING_TABLE, "-default", "default", "Default",
 	"normal", Tk_Offset(Button, button.defaultStateObj), -1,
-	0, (void *)ttkDefaultStrings, DEFAULTSTATE_CHANGED},
+	0, ttkDefaultStrings, DEFAULTSTATE_CHANGED},
 
     WIDGET_TAKEFOCUS_TRUE,
     WIDGET_INHERIT_OPTIONS(BaseOptionSpecs)
@@ -819,7 +820,7 @@ static Tk_OptionSpec MenubuttonOptionSpecs[] =
 	"", Tk_Offset(Menubutton, menubutton.menuObj), -1, 0,0,0},
     {TK_OPTION_STRING_TABLE, "-direction", "direction", "Direction",
 	"below", Tk_Offset(Menubutton, menubutton.directionObj), -1,
-	0, (void *)directionStrings, GEOMETRY_CHANGED},
+	0, directionStrings, GEOMETRY_CHANGED},
 
     WIDGET_TAKEFOCUS_TRUE,
     WIDGET_INHERIT_OPTIONS(BaseOptionSpecs)
@@ -862,8 +863,8 @@ TTK_END_LAYOUT
  * +++ Initialization.
  */
 
-MODULE_SCOPE
-void TtkButton_Init(Tcl_Interp *interp)
+MODULE_SCOPE void
+TtkButton_Init(Tcl_Interp *interp)
 {
     Ttk_Theme theme = Ttk_GetDefaultTheme(interp);
 

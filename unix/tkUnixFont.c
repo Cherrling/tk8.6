@@ -105,7 +105,7 @@ typedef struct UnixFont {
 				 * order to draw/measure all the characters
 				 * encountered by this font so far. All fonts
 				 * start off with one SubFont initialized by
-				 * AllocFont() from the original set of font
+				 * InitFont() from the original set of font
 				 * attributes. Usually points to
 				 * staticSubFonts, but may point to malloced
 				 * space if there are lots of SubFonts. */
@@ -246,6 +246,33 @@ static int		UtfToUcs2beProc(void *clientData, const char*src,
 			    int srcLen, int flags, Tcl_EncodingState*statePtr,
 			    char *dst, int dstLen, int *srcReadPtr,
 			    int *dstWrotePtr, int *dstCharsPtr);
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * XLoadQueryFontNoXError --
+ *
+ *	This function is XLoadQueryFont wrapped in a NULL error handler.
+ *	It is a temporary workaround for ticket [36e379c01b],
+ *	"macOS Ventura, X11 build with XQuartz: crash in XLoadQueryFont",
+ *	which actually is issue #216 in XQuartz:
+ *	https://github.com/XQuartz/XQuartz/issues/216
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static XFontStruct *
+XLoadQueryFontNoXError(Display *display, char *name)
+{
+    XFontStruct *fontStructPtr = NULL;
+    Tk_ErrorHandler handler;
+
+    /* 45 is the major opcode of X_OpenFont */
+    handler = Tk_CreateErrorHandler(display, BadValue, 45, -1, NULL, NULL);
+    fontStructPtr = XLoadQueryFont(display, name);
+    Tk_DeleteErrorHandler(handler);
+    return fontStructPtr;
+}
 
 /*
  *-------------------------------------------------------------------------
@@ -554,6 +581,14 @@ Ucs2beToUtfProc(
  *-------------------------------------------------------------------------
  */
 
+#if defined(USE_TCL_STUBS)
+/* Since the UCS-2BE encoding is only used when Tk is dynamically loaded in Tcl 8.6,
+ * make sure that Tcl_UtfCharComplete is ALWAYS the pre-TIP #575 version,
+ * even though Tk is being compiled with -DTCL_NO_DEPRECATED! */
+#   undef Tcl_UtfCharComplete
+#   define Tcl_UtfCharComplete ((int (*)(const char *, int))(void *)((&tclStubsPtr->tcl_PkgProvideEx)[326]))
+#endif
+
 static int
 UtfToUcs2beProc(
     TCL_UNUSED(void *),	/* TableEncodingData that specifies
@@ -692,7 +727,7 @@ TkpGetNativeFont(
 	return NULL;
     }
 
-    fontStructPtr = XLoadQueryFont(Tk_Display(tkwin), name);
+    fontStructPtr = XLoadQueryFontNoXError(Tk_Display(tkwin), (char *)name);
     if (fontStructPtr == NULL) {
 	/*
 	 * Handle all names that look like XLFDs here. Otherwise, when
@@ -947,7 +982,7 @@ void
 TkpGetFontAttrsForChar(
     Tk_Window tkwin,		/* Window on the font's display */
     Tk_Font tkfont,		/* Font to query */
-    int c,         		/* Character of interest */
+    int c,			/* Character of interest */
     TkFontAttributes *faPtr)	/* Output: Font attributes */
 {
     FontAttributes atts;
@@ -1011,7 +1046,8 @@ Tk_MeasureChars(
 {
     UnixFont *fontPtr;
     SubFont *lastSubFontPtr;
-    int curX, curByte, ch;
+    int curByte;
+    int curX, ch;
 
     /*
      * Unix does not use kerning or fractional character widths when
@@ -1427,7 +1463,7 @@ TkpDrawAngledCharsInContext(
 				 * passed to this function. If they are not
 				 * stripped out, they will be displayed as
 				 * regular printing characters. */
-    int numBytes,		/* Number of bytes in string. */
+    TCL_UNUSED(int),		/* Number of bytes in string. */
     int rangeStart,		/* Index of first byte to draw. */
     int rangeLength,		/* Length of range to draw in bytes. */
     double x, double y,		/* Coordinates at which to place origin of the
@@ -1437,8 +1473,6 @@ TkpDrawAngledCharsInContext(
 {
     int widthUntilStart;
     double sinA = sin(angle * PI/180.0), cosA = cos(angle * PI/180.0);
-
-    (void) numBytes; /*unused*/
 
     Tk_MeasureChars(tkfont, source, rangeStart, -1, 0, &widthUntilStart);
     TkDrawAngledChars(display, drawable, gc, tkfont, source + rangeStart,
@@ -2015,14 +2049,14 @@ FindSubFontForChar(
 	ch = 0xFFFD;
     }
 
+    if (FontMapLookup(&fontPtr->controlSubFont, ch)) {
+	return &fontPtr->controlSubFont;
+    }
+
     for (i = 0; i < fontPtr->numSubFonts; i++) {
 	if (FontMapLookup(&fontPtr->subFontArray[i], ch)) {
 	    return &fontPtr->subFontArray[i];
 	}
-    }
-
-    if (FontMapLookup(&fontPtr->controlSubFont, ch)) {
-	return &fontPtr->controlSubFont;
     }
 
     /*
@@ -2802,14 +2836,14 @@ GetScreenFont(
 	    rest = strchr(rest + 1, '-');
 	}
 	*str = '\0';
-	sprintf(buf, "%.200s-%d-*-*-*-*-*%s", nameList[bestIdx[1]],
+	snprintf(buf, sizeof(buf), "%.200s-%d-*-*-*-*-*%s", nameList[bestIdx[1]],
 		(int)(-wantPtr->fa.size+0.5), rest);
 	*str = '-';
-	fontStructPtr = XLoadQueryFont(display, buf);
+	fontStructPtr = XLoadQueryFontNoXError(display, buf);
 	bestScore[1] = INT_MAX;
     }
     if (fontStructPtr == NULL) {
-	fontStructPtr = XLoadQueryFont(display, nameList[bestIdx[0]]);
+	fontStructPtr = XLoadQueryFontNoXError(display, nameList[bestIdx[0]]);
 	if (fontStructPtr == NULL) {
 	    /*
 	     * This shouldn't happen because the font name is one of the names
@@ -2849,9 +2883,9 @@ GetSystemFont(
 {
     XFontStruct *fontStructPtr;
 
-    fontStructPtr = XLoadQueryFont(display, "fixed");
+    fontStructPtr = XLoadQueryFontNoXError(display, "fixed");
     if (fontStructPtr == NULL) {
-	fontStructPtr = XLoadQueryFont(display, "*");
+	fontStructPtr = XLoadQueryFontNoXError(display, "*");
 	if (fontStructPtr == NULL) {
 	    Tcl_Panic("TkpGetFontFromAttributes: cannot get any font");
 	}
@@ -2940,7 +2974,7 @@ ListFonts(
 {
     char buf[256];
 
-    sprintf(buf, "-*-%.80s-*-*-*-*-*-*-*-*-*-*-*-*", faceName);
+    snprintf(buf, sizeof(buf), "-*-%.80s-*-*-*-*-*-*-*-*-*-*-*-*", faceName);
     return XListFonts(display, buf, 10000, numNamesPtr);
 }
 

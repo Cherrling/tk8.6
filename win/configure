@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP AR ac_ct_AR RANLIB ac_ct_RANLIB RC ac_ct_RC SET_MAKE TCL_THREADS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_DEFS CYGPATH CELIB_DIR DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING CFLAGS_NOLTO MAN2TCLFLAGS CFLAGS_DEFAULT LDFLAGS_DEFAULT VC_MANIFEST_EMBED_DLL VC_MANIFEST_EMBED_EXE BUILD_TCLSH TCLSH_PROG TK_WIN_VERSION MACHINE TK_VERSION TK_MAJOR_VERSION TK_MINOR_VERSION TK_PATCH_LEVEL TK_DBGX TK_LIB_FILE TK_DLL_FILE TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_BUILD_STUB_LIB_SPEC TK_SRC_DIR TK_BIN_DIR TCL_MAJOR_VERSION TCL_MINOR_VERSION TCL_PATCH_LEVEL TCL_DBGX CFG_TK_SHARED_LIB_SUFFIX CFG_TK_UNSHARED_LIB_SUFFIX CFG_TK_EXPORT_FILE_SUFFIX EXTRA_CFLAGS DEPARG CC_OBJNAME CC_EXENAME LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LDFLAGS_CONSOLE LDFLAGS_WINDOW TK_RES STLIB_LD SHLIB_LD SHLIB_LD_LIBS SHLIB_CFLAGS SHLIB_SUFFIX TK_SHARED_BUILD LIBS_GUI DLLSUFFIX LIBPREFIX LIBSUFFIX EXESUFFIX LIBRARIES MAKE_LIB MAKE_STUB_LIB POST_MAKE_LIB MAKE_DLL MAKE_EXE TK_LIB_FLAG TK_LIB_SPEC TK_BUILD_LIB_SPEC TK_STUB_LIB_SPEC TK_STUB_LIB_PATH TK_BUILD_STUB_LIB_PATH TK_CC_SEARCH_FLAGS TK_LD_SEARCH_FLAGS RC_OUT RC_TYPE RC_INCLUDE RC_DEFINE RC_DEFINES RES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP AR ac_ct_AR RANLIB ac_ct_RANLIB RC ac_ct_RC SET_MAKE TCL_THREADS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_DEFS CYGPATH CELIB_DIR DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING CFLAGS_NOLTO MAN2TCLFLAGS CFLAGS_DEFAULT LDFLAGS_DEFAULT VC_MANIFEST_EMBED_DLL VC_MANIFEST_EMBED_EXE BUILD_TCLSH TCLSH_PROG TK_WIN_VERSION MACHINE TK_VERSION TK_MAJOR_VERSION TK_MINOR_VERSION TK_PATCH_LEVEL TK_DBGX TK_LIB_FILE TK_DLL_FILE TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_BUILD_STUB_LIB_SPEC TK_SRC_DIR TK_BIN_DIR TCL_MAJOR_VERSION TCL_MINOR_VERSION TCL_PATCH_LEVEL TCL_DBGX CFG_TK_SHARED_LIB_SUFFIX CFG_TK_UNSHARED_LIB_SUFFIX EXTRA_CFLAGS DEPARG CC_OBJNAME CC_EXENAME LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LDFLAGS_CONSOLE LDFLAGS_WINDOW TK_RES STLIB_LD SHLIB_LD SHLIB_LD_LIBS SHLIB_CFLAGS SHLIB_SUFFIX TK_SHARED_BUILD LIBS_GUI DLLSUFFIX LIBPREFIX LIBSUFFIX EXESUFFIX LIBRARIES MAKE_LIB MAKE_STUB_LIB POST_MAKE_LIB MAKE_DLL MAKE_EXE TK_LIB_FLAG TK_LIB_SPEC TK_BUILD_LIB_SPEC TK_STUB_LIB_SPEC TK_STUB_LIB_PATH TK_BUILD_STUB_LIB_PATH TK_CC_SEARCH_FLAGS TK_LD_SEARCH_FLAGS RC_OUT RC_TYPE RC_INCLUDE RC_DEFINE RC_DEFINES RES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1325,7 +1325,7 @@ SHELL=/bin/sh
 TK_VERSION=8.6
 TK_MAJOR_VERSION=8
 TK_MINOR_VERSION=6
-TK_PATCH_LEVEL=".12"
+TK_PATCH_LEVEL=".16"
 VER=$TK_MAJOR_VERSION$TK_MINOR_VERSION
 
 #------------------------------------------------------------------------
@@ -3242,11 +3242,11 @@ echo "${ECHO_T}found ${TCL_BIN_DIR}/tclConfig.sh" >&6
 echo $ECHO_N "checking for existence of ${TCL_BIN_DIR}/tclConfig.sh... $ECHO_C" >&6
 
     if test -f "${TCL_BIN_DIR}/tclConfig.sh" ; then
-        echo "$as_me:$LINENO: result: loading" >&5
+	echo "$as_me:$LINENO: result: loading" >&5
 echo "${ECHO_T}loading" >&6
 	. "${TCL_BIN_DIR}/tclConfig.sh"
     else
-        echo "$as_me:$LINENO: result: could not find ${TCL_BIN_DIR}/tclConfig.sh" >&5
+	echo "$as_me:$LINENO: result: could not find ${TCL_BIN_DIR}/tclConfig.sh" >&5
 echo "${ECHO_T}could not find ${TCL_BIN_DIR}/tclConfig.sh" >&6
     fi
 
@@ -3260,9 +3260,9 @@ echo "${ECHO_T}could not find ${TCL_BIN_DIR}/tclConfig.sh" >&6
     #
 
     if test -f $TCL_BIN_DIR/Makefile ; then
-        TCL_LIB_SPEC=${TCL_BUILD_LIB_SPEC}
-        TCL_STUB_LIB_SPEC=${TCL_BUILD_STUB_LIB_SPEC}
-        TCL_STUB_LIB_PATH=${TCL_BUILD_STUB_LIB_PATH}
+	TCL_LIB_SPEC=${TCL_BUILD_LIB_SPEC}
+	TCL_STUB_LIB_SPEC=${TCL_BUILD_STUB_LIB_SPEC}
+	TCL_STUB_LIB_PATH=${TCL_BUILD_STUB_LIB_PATH}
     fi
 
     #
@@ -3408,7 +3408,7 @@ fi
     SHLIB_SUFFIX=".dll"
 
     # MACHINE is IX86 for LINK, but this is used by the manifest,
-    # which requires x86|amd64|ia64.
+    # which requires x86|amd64|arm64|ia64.
     MACHINE="X86"
 
     if test "$GCC" = "yes"; then
@@ -3481,6 +3481,13 @@ echo "${ECHO_T}$ac_cv_cross" >&6
 		RANLIB="x86_64-w64-mingw32-ranlib"
 		RC="x86_64-w64-mingw32-windres"
 	    ;;
+	    arm64|aarch64)
+		CC="aarch64-w64-mingw32-${CC}"
+		LD="aarch64-w64-mingw32-ld"
+		AR="aarch64-w64-mingw32-ar"
+		RANLIB="aarch64-w64-mingw32-ranlib"
+		RC="aarch64-w64-mingw32-windres"
+	    ;;
 	    *)
 		CC="i686-w64-mingw32-${CC}"
 		LD="i686-w64-mingw32-ld"
@@ -3526,9 +3533,9 @@ echo "${ECHO_T}yes" >&6
     fi
 
     if test "$CYGPATH" = "echo"; then
-        DEPARG='"$<"'
+	DEPARG='"$<"'
     else
-        DEPARG='"$(shell $(CYGPATH) $<)"'
+	DEPARG='"$(shell $(CYGPATH) $<)"'
     fi
 
     # set various compiler flags depending on whether we are using gcc or cl
@@ -3599,6 +3606,9 @@ echo "${ECHO_T}$ac_cv_win32" >&6
 echo "$as_me: error: ${CC} cannot produce win32 executables." >&2;}
    { (exit 1); exit 1; }; }
 	fi
+	if test "$do64bit" != "arm64"; then
+	    extra_cflags="$extra_cflags -DHAVE_CPUID=1"
+	fi
 
 	hold_cflags=$CFLAGS; CFLAGS="$CFLAGS -mwindows -municode -Dmain=xxmain"
 	echo "$as_me:$LINENO: checking for working -municode linker flag" >&5
@@ -3665,6 +3675,7 @@ echo "${ECHO_T}$ac_cv_municode" >&6
 	else
 	    extra_cflags="$extra_cflags -DTCL_BROKEN_MAINARGS"
 	fi
+	hold_cflags=$CFLAGS; CFLAGS="$CFLAGS -fno-lto"
 	echo "$as_me:$LINENO: checking for working -fno-lto" >&5
 echo $ECHO_N "checking for working -fno-lto... $ECHO_C" >&6
 if test "${ac_cv_nolto+set}" = set; then
@@ -3727,6 +3738,66 @@ echo "${ECHO_T}$ac_cv_nolto" >&6
 	fi
     fi
 
+    hold_cflags=$CFLAGS; CFLAGS="$CFLAGS -Wl,--enable-auto-image-base"
+    echo "$as_me:$LINENO: checking for working --enable-auto-image-base" >&5
+echo $ECHO_N "checking for working --enable-auto-image-base... $ECHO_C" >&6
+if test "${ac_cv_enable_auto_image_base+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_enable_auto_image_base=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_enable_auto_image_base=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_enable_auto_image_base" >&5
+echo "${ECHO_T}$ac_cv_enable_auto_image_base" >&6
+    CFLAGS=$hold_cflags
+    if test "$ac_cv_enable_auto_image_base" = "yes" ; then
+	extra_ldflags="$extra_ldflags -Wl,--enable-auto-image-base"
+    fi
+
     echo "$as_me:$LINENO: checking compiler flags" >&5
 echo $ECHO_N "checking compiler flags... $ECHO_C" >&6
     if test "${GCC}" = "yes" ; then
@@ -3749,22 +3820,22 @@ echo $ECHO_N "checking compiler flags... $ECHO_C" >&6
 
 	if test "${SHARED_BUILD}" = "0" ; then
 	    # static
-            echo "$as_me:$LINENO: result: using static flags" >&5
+	    echo "$as_me:$LINENO: result: using static flags" >&5
 echo "${ECHO_T}using static flags" >&6
 	    runtime=
 	    LIBRARIES="\${STATIC_LIBRARIES}"
 	    EXESUFFIX="s\${DBGX}.exe"
 	else
 	    # dynamic
-            echo "$as_me:$LINENO: result: using shared flags" >&5
+	    echo "$as_me:$LINENO: result: using shared flags" >&5
 echo "${ECHO_T}using shared flags" >&6
 
 	    # ad-hoc check to see if CC supports -shared.
 	    if "${CC}" -shared 2>&1 | egrep ': -shared not supported' >/dev/null; then
 		{ { echo "$as_me:$LINENO: error: ${CC} does not support the -shared option.
-                You will need to upgrade to a newer version of the toolchain." >&5
+		You will need to upgrade to a newer version of the toolchain." >&5
 echo "$as_me: error: ${CC} does not support the -shared option.
-                You will need to upgrade to a newer version of the toolchain." >&2;}
+		You will need to upgrade to a newer version of the toolchain." >&2;}
    { (exit 1); exit 1; }; }
 	    fi
 
@@ -3831,10 +3902,15 @@ echo "$as_me: error: ${CC} does not support the -shared option.
 		echo "$as_me:$LINENO: result:    Using 64-bit $MACHINE mode" >&5
 echo "${ECHO_T}   Using 64-bit $MACHINE mode" >&6
 		;;
+	    arm64|aarch64)
+		MACHINE="ARM64"
+		echo "$as_me:$LINENO: result:    Using ARM64 $MACHINE mode" >&5
+echo "${ECHO_T}   Using ARM64 $MACHINE mode" >&6
+		;;
 	    ia64)
 		MACHINE="IA64"
-		echo "$as_me:$LINENO: result:    Using 64-bit $MACHINE mode" >&5
-echo "${ECHO_T}   Using 64-bit $MACHINE mode" >&6
+		echo "$as_me:$LINENO: result:    Using IA64 $MACHINE mode" >&5
+echo "${ECHO_T}   Using IA64 $MACHINE mode" >&6
 		;;
 	    *)
 		cat >conftest.$ac_ext <<_ACEOF
@@ -3888,9 +3964,9 @@ tcl_win_64bit=no
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 		if test "$tcl_win_64bit" = "yes" ; then
-			do64bit=amd64
-			MACHINE="AMD64"
-			echo "$as_me:$LINENO: result:    Using 64-bit $MACHINE mode" >&5
+		    do64bit=amd64
+		    MACHINE="AMD64"
+		    echo "$as_me:$LINENO: result:    Using 64-bit $MACHINE mode" >&5
 echo "${ECHO_T}   Using 64-bit $MACHINE mode" >&6
 		fi
 		;;
@@ -3898,14 +3974,14 @@ echo "${ECHO_T}   Using 64-bit $MACHINE mode" >&6
     else
 	if test "${SHARED_BUILD}" = "0" ; then
 	    # static
-            echo "$as_me:$LINENO: result: using static flags" >&5
+	    echo "$as_me:$LINENO: result: using static flags" >&5
 echo "${ECHO_T}using static flags" >&6
 	    runtime=-MT
 	    LIBRARIES="\${STATIC_LIBRARIES}"
 	    EXESUFFIX="s\${DBGX}.exe"
 	else
 	    # dynamic
-            echo "$as_me:$LINENO: result: using shared flags" >&5
+	    echo "$as_me:$LINENO: result: using shared flags" >&5
 echo "${ECHO_T}using shared flags" >&6
 	    runtime=-MD
 	    # Add SHLIB_LD_LIBS to the Make rule, not here.
@@ -3931,6 +4007,9 @@ echo "${ECHO_T}using shared flags" >&6
 		amd64|x64|yes)
 		    MACHINE="AMD64" ; # assume AMD64 as default 64-bit build
 		    ;;
+		arm64|aarch64)
+		    MACHINE="ARM64"
+		    ;;
 		ia64)
 		    MACHINE="IA64"
 		    ;;
@@ -3952,8 +4031,7 @@ echo "${ECHO_T}   Using 64-bit $MACHINE mode" >&6
 	if test "$do64bit" != "no" ; then
 	    RC="rc"
 	    CFLAGS_DEBUG="-nologo -Zi -Od ${runtime}d"
-	    # Do not use -O2 for Win64 - this has proved buggy in code gen.
-	    CFLAGS_OPTIMIZE="-nologo -O1 ${runtime}"
+	    CFLAGS_OPTIMIZE="-nologo -O2 ${runtime}"
 	    lflags="${lflags} -nologo -MACHINE:${MACHINE}"
 	    LINKBIN="link"
 	    # Avoid 'unresolved external symbol __security_cookie' errors.
@@ -3973,7 +4051,7 @@ echo "${ECHO_T}   Using 64-bit $MACHINE mode" >&6
 	if test "$doWince" != "no" ; then
 	    # Set defaults for common evc4/PPC2003 setup
 	    # Currently Tcl requires 300+, possibly 420+ for sockets
-	    CEVERSION=420; 		# could be 211 300 301 400 420 ...
+	    CEVERSION=420;	# could be 211 300 301 400 420 ...
 	    TARGETCPU=ARMV4;	# could be ARMV4 ARM MIPS SH3 X86 ...
 	    ARCH=ARM;		# could be ARM MIPS X86EM ...
 	    PLATFORM="Pocket PC 2003"; # or "Pocket PC 2002"
@@ -5291,9 +5369,8 @@ TK_SHARED_BUILD=${SHARED_BUILD}
 
 TK_SHARED_LIB_SUFFIX="\${NODOT_VERSION}${DLLSUFFIX}"
 TK_UNSHARED_LIB_SUFFIX="\${NODOT_VERSION}${LIBSUFFIX}"
-TK_EXPORT_FILE_SUFFIX="\${NODOT_VERSION}${LIBSUFFIX}"
 
-eval "TK_SRC_DIR=\"`cd $srcdir/..; pwd`\""
+eval "TK_SRC_DIR=\"`cd $srcdir/..; $CYGPATH $(pwd)`\""
 
 eval "TK_DLL_FILE=tk$VER${DLLSUFFIX}"
 if test ${SHARED_BUILD} = 0 -o "$GCC" != "yes" ; then
@@ -5308,14 +5385,14 @@ eval "TK_STUB_LIB_FILE=${LIBPREFIX}tkstub${VER}${LIBSUFFIX}"
 # we also need to double check about spaces in path names
 eval "TK_LIB_FLAG=\"-ltk${VER}${LIBFLAGSUFFIX}\""
 TK_LIB_SPEC="-L${libdir} ${TK_LIB_FLAG}"
-TK_BUILD_LIB_SPEC="-L`pwd` ${TK_LIB_FLAG}"
+eval "TK_BUILD_LIB_SPEC=\"-L`$CYGPATH $(pwd)` ${TK_LIB_FLAG}\""
 
 eval "TK_STUB_LIB_FLAG=\"-ltkstub${VER}${LIBFLAGSUFFIX}\""
-TK_BUILD_STUB_LIB_SPEC="-L`pwd` ${TK_STUB_LIB_FLAG}"
+eval "TK_BUILD_STUB_LIB_SPEC=\"-L`$CYGPATH $(pwd)` ${TK_STUB_LIB_FLAG}\""
 
 TK_STUB_LIB_SPEC="-L${libdir} ${TK_STUB_LIB_FLAG}"
 TK_STUB_LIB_PATH="${libdir}/${TK_STUB_LIB_FILE}"
-TK_BUILD_STUB_LIB_PATH="`pwd`/${TK_STUB_LIB_FILE}"
+eval "TK_BUILD_STUB_LIB_PATH=\"`$CYGPATH $(pwd)`/${TK_STUB_LIB_FILE}\""
 
 eval "DLLSUFFIX=${DLLSUFFIX}"
 eval "LIBPREFIX=${LIBPREFIX}"
@@ -5324,25 +5401,24 @@ eval "EXESUFFIX=${EXESUFFIX}"
 
 CFG_TK_SHARED_LIB_SUFFIX=${TK_SHARED_LIB_SUFFIX}
 CFG_TK_UNSHARED_LIB_SUFFIX=${TK_UNSHARED_LIB_SUFFIX}
-CFG_TK_EXPORT_FILE_SUFFIX=${TK_EXPORT_FILE_SUFFIX}
 
 #--------------------------------------------------------------------
 # Adjust the defines for how the resources are built depending
 # on symbols and static vs. shared.
 #--------------------------------------------------------------------
 
-if test ${SHARED_BUILD} = 0 -o "$TCL_NEEDS_EXP_FILE" = 0; then
+if test ${SHARED_BUILD} = 0; then
     if test "${DBGX}" = "d"; then
-        RC_DEFINES="${RC_DEFINE} STATIC_BUILD ${RC_DEFINE} DEBUG"
+	RC_DEFINES="${RC_DEFINE} STATIC_BUILD ${RC_DEFINE} DEBUG"
     else
-        RC_DEFINES="${RC_DEFINE} STATIC_BUILD"
+	RC_DEFINES="${RC_DEFINE} STATIC_BUILD"
     fi
     TK_RES=""
 else
     if test "${DBGX}" = "d"; then
-        RC_DEFINES="${RC_DEFINE} DEBUG"
+	RC_DEFINES="${RC_DEFINE} DEBUG"
     else
-        RC_DEFINES=""
+	RC_DEFINES=""
     fi
     TK_RES='tk.$(RES)'
 fi
@@ -5358,7 +5434,6 @@ esac
 TK_WIN_VERSION="$TK_VERSION.$TK_RELEASE_LEVEL.`echo $TK_PATCH_LEVEL | tr -d ab.`"
 
 # X86|AMD64|IA64 for manifest
-
 
 
 
@@ -5442,6 +5517,7 @@ TK_WIN_VERSION="$TK_VERSION.$TK_RELEASE_LEVEL.`echo $TK_PATCH_LEVEL | tr -d ab.`
 
 
                               ac_config_files="$ac_config_files Makefile tkConfig.sh wish.exe.manifest"
+
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -6139,7 +6215,6 @@ s,@TCL_PATCH_LEVEL@,$TCL_PATCH_LEVEL,;t t
 s,@TCL_DBGX@,$TCL_DBGX,;t t
 s,@CFG_TK_SHARED_LIB_SUFFIX@,$CFG_TK_SHARED_LIB_SUFFIX,;t t
 s,@CFG_TK_UNSHARED_LIB_SUFFIX@,$CFG_TK_UNSHARED_LIB_SUFFIX,;t t
-s,@CFG_TK_EXPORT_FILE_SUFFIX@,$CFG_TK_EXPORT_FILE_SUFFIX,;t t
 s,@EXTRA_CFLAGS@,$EXTRA_CFLAGS,;t t
 s,@DEPARG@,$DEPARG,;t t
 s,@CC_OBJNAME@,$CC_OBJNAME,;t t
